@@ -2,10 +2,10 @@ clear all
 close all
 clc
 
-L = 1;
+L = 2;
 H = 1;
 
-n2 = 8;
+n2 = 30;
 n1 = n2*L;
 
 [X,Y,vert,conn] = create_mesh(L,H,n1,n2);
@@ -19,10 +19,20 @@ end
 axis equal
 axis([0 L 0 H]);
 
-A = assembler_poisson(vert,conn,1);
+f = @(x,y) 1;
+
+[A,b] = assembler_poisson(f,vert,conn,[1 1 1 1]);
 
 figure()
 spy(A)
+
+sol = A\b;
+
+n1 = size(X,1);
+n2 = size(X,2);
+
+
+surf(X,Y,reshape(sol,n1,n2));
 
 % mat = [-3 3; 3 0];
 % grad = mat*[0;1];

@@ -13,6 +13,6 @@ elseif (group == 3)
     plot([x x(1)],[y y(1)],'g','Linewidth',1);
 elseif (group == 4)
     plot([x x(1)],[y y(1)],'y','Linewidth',1);
-elseif (group == 5)
+elseif (group == 0)
     plot([x x(1)],[y y(1)],'k');
 end

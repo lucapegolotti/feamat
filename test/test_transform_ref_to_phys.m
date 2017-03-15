@@ -36,8 +36,8 @@ maxy = @(x) ((x-x3(1))./(x2(1)-x3(1))*(x2(2)-x3(2)) + x3(2));
 plot(2.5:0.01:5,miny(2.5:0.01:5));
 plot(2.5:0.01:5,maxy(2.5:0.01:5));
 
-% fun = @(x,y) 1*x.^2 + y.*x;
-fun = @(x,y) sin(x).*y.^2;
+fun = @(x,y) 1*x.^2 + y.*x;
+% fun = @(x,y) sin(x).*y.^2;
 funv = @(x) fun(x(1),x(2));
 fun2 = @(x) funv(f(x));
 

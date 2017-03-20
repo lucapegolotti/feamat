@@ -1,9 +1,9 @@
-function draw_mesh_element(index,vertices,connectivity)
+function draw_mesh_element(index,vertices,elements)
 
-group = connectivity(index,4);
+group = elements(index,4);
 
-x = [vertices(connectivity(index,1),1) vertices(connectivity(index,2),1) vertices(connectivity(index,3),1)]; 
-y = [vertices(connectivity(index,1),2) vertices(connectivity(index,2),2) vertices(connectivity(index,3),2)];
+x = [vertices(elements(index,1),1) vertices(elements(index,2),1) vertices(elements(index,3),1)]; 
+y = [vertices(elements(index,1),2) vertices(elements(index,2),2) vertices(elements(index,3),2)];
 
 if (group == 1)
     plot([x x(1)],[y y(1)],'r','Linewidth',1);

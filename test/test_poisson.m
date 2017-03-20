@@ -2,37 +2,40 @@ clear all
 close all
 clc
 
-L = 2;
+% Set dimension of the domain and parameters of the mesh
+L = 1;
 H = 1;
 
-n2 = 30;
+n2 = 20;
 n1 = n2*L;
 
-[X,Y,vert,conn] = create_mesh(L,H,n1,n2);
+% Create and display the mesh
+mesh = create_mesh(L,H,n1,n2);
+draw_mesh(mesh);
 
-n_el = size(conn,1);
+f = @(x,y) 2*pi^2*sin(pi*x)*sin(pi*y);
+mu = @(x,y) 1;
+dirichlet_functions = @(x,y) [0;0;0;0];
 
-for i = 1:n_el
-    draw_mesh_element(i,vert,conn)
-    hold on
-end
-axis equal
-axis([0 L 0 H]);
+% Create finite element space
+bc = [1 1 1 1]; 
 
-f = @(x,y) 1;
+poly_degree = 'P1';
+fespace = create_fespace(mesh,poly_degree,bc);
 
-[A,b] = assembler_poisson(f,vert,conn,[1 1 1 1]);
+[A,b] = assembler_poisson(f,mu,fespace,dirichlet_functions);
+
 
 figure()
 spy(A)
 
 sol = A\b;
 
-n1 = size(X,1);
-n2 = size(X,2);
+n1 = size(mesh.X,1);
+n2 = size(mesh.X,2);
 
 
-surf(X,Y,reshape(sol,n1,n2));
+surf(mesh.X,mesh.Y,reshape(sol,n1,n2));
 
 % mat = [-3 3; 3 0];
 % grad = mat*[0;1];

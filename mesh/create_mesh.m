@@ -1,4 +1,4 @@
-function [X,Y,vertices, connectivity] = create_mesh(L,H,n_elements1,n_elements2)
+function [mesh] = create_mesh(L,H,n_elements1,n_elements2)
 % Generates rectangular mesh.
 % input= L: length
 %        H: height
@@ -22,18 +22,18 @@ function [X,Y,vertices, connectivity] = create_mesh(L,H,n_elements1,n_elements2)
     
     % last column represents group: 1: bottom, 2: right, 3: top, 4: left,
     %                               5: internal
-    connectivity = zeros(n_elements,4);
+    elements = zeros(n_elements,4);
     
     count = 0;
     i = 1;
     for j = 1:n_elements1
         count = count + 1;
         if (j == n_elements1)
-            connectivity(count,:) = [j+(i-1)*(n_elements1+1) j+1+(i-1)*(n_elements1+1) j+1+i*(n_elements1+1) 2];
+            elements(count,:) = [j+(i-1)*(n_elements1+1) j+1+(i-1)*(n_elements1+1) j+1+i*(n_elements1+1) 2];
             vertices(j+(i-1)*(n_elements1+1),3) = 2;
             vertices(j+1+(i-1)*(n_elements1+1),3) = 2;
         else
-            connectivity(count,:) = [j+(i-1)*(n_elements1+1) j+1+(i-1)*(n_elements1+1) j+1+i*(n_elements1+1) 1];
+            elements(count,:) = [j+(i-1)*(n_elements1+1) j+1+(i-1)*(n_elements1+1) j+1+i*(n_elements1+1) 1];
             vertices(j+(i-1)*(n_elements1+1),3) = 1;
             vertices(j+1+(i-1)*(n_elements1+1),3) = 1;
         end
@@ -42,11 +42,11 @@ function [X,Y,vertices, connectivity] = create_mesh(L,H,n_elements1,n_elements2)
     for j = 1:n_elements1
         count = count + 1;
         if (j == 1)
-            connectivity(count,:) = [j+(i-1)*(n_elements1+1) j+i*(n_elements1+1) j+i*(n_elements1+1)+1 4];
+            elements(count,:) = [j+(i-1)*(n_elements1+1) j+i*(n_elements1+1) j+i*(n_elements1+1)+1 4];
             vertices(j+(i-1)*(n_elements1+1),3) = 4;
             vertices(j+i*(n_elements1+1),3) = 4;
         else
-            connectivity(count,:) = [j+(i-1)*(n_elements1+1) j+i*(n_elements1+1) j+i*(n_elements1+1)+1 0];
+            elements(count,:) = [j+(i-1)*(n_elements1+1) j+i*(n_elements1+1) j+i*(n_elements1+1)+1 0];
         end
     end
     
@@ -54,22 +54,22 @@ function [X,Y,vertices, connectivity] = create_mesh(L,H,n_elements1,n_elements2)
        for j = 1:n_elements1
           count = count + 1;
           if (j == n_elements1)
-            connectivity(count,:) = [j+(i-1)*(n_elements1+1) j+1+(i-1)*(n_elements1+1) j+1+i*(n_elements1+1) 2];
+            elements(count,:) = [j+(i-1)*(n_elements1+1) j+1+(i-1)*(n_elements1+1) j+1+i*(n_elements1+1) 2];
             vertices(j+1+(i-1)*(n_elements1+1),3) = 2;
             vertices(j+1+i*(n_elements1+1),3) = 2;
           else
-            connectivity(count,:) = [j+(i-1)*(n_elements1+1) j+1+(i-1)*(n_elements1+1) j+1+i*(n_elements1+1) 0];
+            elements(count,:) = [j+(i-1)*(n_elements1+1) j+1+(i-1)*(n_elements1+1) j+1+i*(n_elements1+1) 0];
           end
        end
        
        for j = 1:n_elements1
           count = count + 1;
           if (j == 1)
-            connectivity(count,:) = [j+(i-1)*(n_elements1+1) j+i*(n_elements1+1) j+i*(n_elements1+1)+1 4];
+            elements(count,:) = [j+(i-1)*(n_elements1+1) j+i*(n_elements1+1) j+i*(n_elements1+1)+1 4];
             vertices(j+(i-1)*(n_elements1+1),3) = 4;
             vertices(j+i*(n_elements1+1),3) = 4;
           else
-            connectivity(count,:) = [j+(i-1)*(n_elements1+1) j+i*(n_elements1+1) j+i*(n_elements1+1)+1 0];
+            elements(count,:) = [j+(i-1)*(n_elements1+1) j+i*(n_elements1+1) j+i*(n_elements1+1)+1 0];
           end
        end
     end
@@ -77,26 +77,35 @@ function [X,Y,vertices, connectivity] = create_mesh(L,H,n_elements1,n_elements2)
     for j = 1:n_elements1
         count = count + 1;
         if (j == n_elements1)
-            connectivity(count,:) = [j+(i-1)*(n_elements1+1) j+1+(i-1)*(n_elements1+1) j+1+i*(n_elements1+1) 2];
+            elements(count,:) = [j+(i-1)*(n_elements1+1) j+1+(i-1)*(n_elements1+1) j+1+i*(n_elements1+1) 2];
             vertices(j+1+(i-1)*(n_elements1+1),3) = 2;
             vertices(j+1+i*(n_elements1+1),3) = 2;
         else
-            connectivity(count,:) = [j+(i-1)*(n_elements1+1) j+1+(i-1)*(n_elements1+1) j+1+i*(n_elements1+1) 0];
+            elements(count,:) = [j+(i-1)*(n_elements1+1) j+1+(i-1)*(n_elements1+1) j+1+i*(n_elements1+1) 0];
         end
     end
        
     for j = 1:n_elements1
         count = count + 1;
         if (j == 1)
-            connectivity(count,:) = [j+(i-1)*(n_elements1+1) j+i*(n_elements1+1) j+i*(n_elements1+1)+1 4];
+            elements(count,:) = [j+(i-1)*(n_elements1+1) j+i*(n_elements1+1) j+i*(n_elements1+1)+1 4];
             vertices(j+(i-1)*(n_elements1+1),3) = 4;
             vertices(j+i*(n_elements1+1),3) = 4;
         else
-            connectivity(count,:) = [j+(i-1)*(n_elements1+1) j+i*(n_elements1+1) j+i*(n_elements1+1)+1 3];
+            elements(count,:) = [j+(i-1)*(n_elements1+1) j+i*(n_elements1+1) j+i*(n_elements1+1)+1 3];
             vertices(j+i*(n_elements1+1),3) = 3;
             vertices(j+i*(n_elements1+1)+1,3) = 3;
         end
     end
+    
+    disp(['Creating rectangular mesh with ', num2str(n_elements), ...
+           ' elements (L = ', num2str(L), ', H = ', num2str(H),')']);
+    mesh.vertices = vertices;
+    mesh.elements = elements;
+    mesh.X = X;
+    mesh.Y = Y;
+    mesh.L = L;
+    mesh.H = H;
     
 end
 

@@ -1,19 +1,25 @@
-function [A,b] = assembler_poisson(fun,vertices, connectivity,flags_bc)
+function [A,b] = assembler_poisson(fun,mu,fespace,dirichlet_functions)
 
-n = size(connectivity,1);
-n_vertices = size(vertices,1);
+connectivity = fespace.connectivity;
+vertices = fespace.mesh.vertices;
+nodes = fespace.nodes;
 
-A = zeros(n_vertices,n_vertices);
+n_elements = size(connectivity,1);
+n_nodes = size(nodes,1);
 
-gp = [1/6 1/6; 2/3 1/6; 1/6 2/3];
+A = zeros(n_nodes,n_nodes);
+
+gp = [1/6 1/6; 2/3 1/6; 1/6 2/3]';
 weights = [1/3 1/3 1/3];
 n_gauss = length(weights);
 
-grad1_ref = [-1;-1];
-grad2_ref = [1;0];
-grad3_ref = [0;1];
+nlocalfunctions = size(fespace.grads,2);
 
-for i = 1:n
+mu_vec = @(x) mu(x(1),x(2));
+
+disp('Building system');
+
+for i = 1:n_elements
     indices = connectivity(i,1:3);
     x1 = vertices(indices(1),1:2)';
     x2 = vertices(indices(2),1:2)';
@@ -23,41 +29,24 @@ for i = 1:n
     invtransf = inv(transf);
     dettransf = abs(det(transf));
     
-    grad1 = invtransf' * grad1_ref;
-    grad2 = invtransf' * grad2_ref;
-    grad3 = invtransf' * grad3_ref;
+    transfgrad = invtransf' * fespace.grads;
 
     for j = 1:n_gauss
-        A(indices(1),indices(2)) = A(indices(1),indices(2)) + dettransf * grad1'*grad2*weights(j) / 2;
-        A(indices(2),indices(3)) = A(indices(2),indices(3)) + dettransf * grad2'*grad3*weights(j) / 2;
-        A(indices(3),indices(1)) = A(indices(3),indices(1)) + dettransf * grad3'*grad1*weights(j) / 2;
-        A(indices(1),indices(1)) = A(indices(1),indices(1)) + dettransf * grad1'*grad1*weights(j) / 2;
-        A(indices(2),indices(2)) = A(indices(2),indices(2)) + dettransf * grad2'*grad2*weights(j) / 2;
-        A(indices(3),indices(3)) = A(indices(3),indices(3)) + dettransf * grad3'*grad3*weights(j) / 2;
-    end
-    A(indices(2),indices(1)) = A(indices(1),indices(2));
-    A(indices(3),indices(2)) = A(indices(2),indices(3));
-    A(indices(1),indices(3)) = A(indices(3),indices(1));
-end
-
-b = zeros(n_vertices,1);
-
-for i = 1:n_vertices
-    b(i) = fun(vertices(i,1),vertices(i,2));
-end
-
-for i = 1:n_vertices
-    if (vertices(i,3)~=0)
-        if (flags_bc(vertices(i,3)))
-            for j = 1:n_vertices
-                A(i,j) = 0;
+        for k = 1:nlocalfunctions
+            for l = 1:nlocalfunctions
+                A(indices(k),indices(l)) = A(indices(k),indices(l)) + ...
+                mu_vec(invtransf*gp(:,j))*dettransf*transfgrad(:,k)'*transfgrad(:,l)*weights(j);
             end
-            A(i,i) = 1;
-            b(i) = 0;
         end
     end
-    
 end
 
+b = zeros(n_nodes,1);
+
+for i = 1:n_nodes
+    b(i) = fun(nodes(i,1),nodes(i,2));
+end
+
+[A,b] = apply_bc(A,b,nodes,fespace.bc,dirichlet_functions);
 
 

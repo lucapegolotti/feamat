@@ -1,4 +1,4 @@
-function [A,b] = assembler_poisson(fun,mu,fespace,dirichlet_functions)
+function [A,b] = assembler_poisson(fun,mu,fespace)
 
 connectivity = fespace.connectivity;
 vertices = fespace.mesh.vertices;
@@ -8,16 +8,15 @@ n_elements = size(connectivity,1);
 n_nodes = size(nodes,1);
 
 A = zeros(n_nodes,n_nodes);
+b = zeros(n_nodes,1);
 
-gp = [1/6 1/6; 2/3 1/6; 1/6 2/3]';
-weights = [1/3 1/3 1/3];
-n_gauss = length(weights);
+[gp,weights,n_gauss] = gauss_points(2);
 
-nlocalfunctions = size(fespace.grads,2);
-
-mu_vec = @(x) mu(x(1),x(2));
+nlocalfunctions = fespace.n_functions_per_element;
 
 disp('Building system');
+
+tic 
 
 for i = 1:n_elements
     indices = connectivity(i,1:3);
@@ -25,28 +24,28 @@ for i = 1:n_elements
     x2 = vertices(indices(2),1:2)';
     x3 = vertices(indices(3),1:2)';
 
-    transf = [x2-x1 x3-x1];
-    invtransf = inv(transf);
-    dettransf = abs(det(transf));
+    mattransf = [x2-x1 x3-x1];
+    invmat = inv(mattransf);
     
-    transfgrad = invtransf' * fespace.grads;
-
+    % transformation from parametric to physical
+    transf = @(x) mattransf*x + x1;       
+    dettransf = abs(det(mattransf));
+    
     for j = 1:n_gauss
+        transfgrad = invmat' * fespace.grads(gp(:,j));
+        functions = fespace.functions(gp(:,j));
         for k = 1:nlocalfunctions
+            b(indices(k)) = b(indices(k)) + dettransf*fun(transf(gp(:,j)))*functions(k)*weights(j)/2;
             for l = 1:nlocalfunctions
-                A(indices(k),indices(l)) = A(indices(k),indices(l)) + ...
-                mu_vec(invtransf*gp(:,j))*dettransf*transfgrad(:,k)'*transfgrad(:,l)*weights(j);
+                stiffness_element = mu(transf(gp(:,j)))*dettransf*transfgrad(:,k)'*transfgrad(:,l)*weights(j)/2;
+                A(indices(k),indices(l)) = A(indices(k),indices(l)) + stiffness_element;
             end
         end
     end
 end
 
-b = zeros(n_nodes,1);
-
-for i = 1:n_nodes
-    b(i) = fun(nodes(i,1),nodes(i,2));
-end
-
-[A,b] = apply_bc(A,b,nodes,fespace.bc,dirichlet_functions);
+elapsed = toc;
+disp(['Elapsed time = ', num2str(elapsed),' s']);
+disp('------------------------------');
 
 

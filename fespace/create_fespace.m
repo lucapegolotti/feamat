@@ -11,8 +11,8 @@ if (polydegree == 'P1')
     fespace.mesh = mesh;
     fespace.n_functions_per_element = 3;
     % coefficients of s and t and value for (0,0)
-    fespace.functions = [-1 -1 1; 1 0 0; 0 1 0]';
-    fespace.grads = [-1 -1; 1 0; 0 1]';
+    fespace.functions = @(x) [1-x(1)-x(2);x(1);x(2)];
+    fespace.grads = @(x) [-1 -1; 1 0; 0 1]';
 else 
     error([polydegree, ' is not a valid polynomial degree!']);
 end

@@ -6,7 +6,7 @@ nodes = fespace.nodes;
 
 n_elements = size(connectivity,1);
 
-[gp,weights,n_gauss] = gauss_points(2);
+[gp,weights,n_gauss] = gauss_points2D(2);
 
 nlocalfunctions = fespace.n_functions_per_element;
 

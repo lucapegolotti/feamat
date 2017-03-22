@@ -21,7 +21,7 @@ function [mesh] = create_mesh(L,H,n_elements1,n_elements2)
     
     
     % last column represents group: 1: bottom, 2: right, 3: top, 4: left,
-    %                               5: internal
+    %                               0: internal
     elements = zeros(n_elements,4);
     
     disp(['Creating rectangular mesh with ', num2str(n_elements), ...

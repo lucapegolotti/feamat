@@ -6,7 +6,7 @@ clc
 L = 1;
 H = 1;
 
-n2 = 30;
+n2 = 50;
 n1 = n2*L;
 
 % Create and display the mesh
@@ -17,16 +17,17 @@ solex = @(x,y) sin(pi*x).*sin(pi*y);
 
 f = @(x) 2*pi^2*sin(pi*x(1))*sin(pi*x(2));
 mu = @(x) 1;
-dirichlet_functions = @(x) [0;0;0;0];
+dirichlet_functions = @(x) [x(1);0;0;0];
+neumann_functions = @(x) [0;0;0;0];
 
 % Create finite element space
-bc = [1 1 1 1]; 
+bc = [1 0 0 0]; 
 
 poly_degree = 'P1';
 fespace = create_fespace(mesh,poly_degree,bc);
 
 % Assemble matrix and rhs
-[A,b] = assembler_poisson(f,mu,fespace);
+[A,b] = assembler_poisson(f,mu,fespace,neumann_functions);
 
 % Apply Dirichlet boundary conditions
 [A,b] = apply_bc(A,b,fespace,dirichlet_functions);

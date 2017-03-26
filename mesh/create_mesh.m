@@ -17,7 +17,7 @@ function [mesh] = create_mesh(L,H,n_elements1,n_elements2)
     [X,Y] = meshgrid(x,y);
     X = X';
     Y = Y';
-    vertices = [X(:) Y(:) zeros(length(X(:)),1)];
+    vertices = [X(:) Y(:) zeros(length(X(:)),1) zeros(length(X(:)),1)];
     
     
     % last column represents group: 1: bottom, 2: right, 3: top, 4: left,
@@ -35,8 +35,10 @@ function [mesh] = create_mesh(L,H,n_elements1,n_elements2)
         count = count + 1;
         if (j == n_elements1)
             elements(count,:) = [j+(i-1)*(n_elements1+1) j+1+(i-1)*(n_elements1+1) j+1+i*(n_elements1+1) 2];
-            vertices(j+(i-1)*(n_elements1+1),3) = 2;
-            vertices(j+1+(i-1)*(n_elements1+1),3) = 2;
+            vertices(j+(i-1)*(n_elements1+1),3) = 1;
+            vertices(j+1+(i-1)*(n_elements1+1),3) = 1;
+            vertices(j+1+(i-1)*(n_elements1+1),4) = 2;
+            vertices(j+1+i*(n_elements1+1),3) = 2;
         else
             elements(count,:) = [j+(i-1)*(n_elements1+1) j+1+(i-1)*(n_elements1+1) j+1+i*(n_elements1+1) 1];
             vertices(j+(i-1)*(n_elements1+1),3) = 1;
@@ -49,6 +51,7 @@ function [mesh] = create_mesh(L,H,n_elements1,n_elements2)
         if (j == 1)
             elements(count,:) = [j+(i-1)*(n_elements1+1) j+i*(n_elements1+1) j+i*(n_elements1+1)+1 4];
             vertices(j+(i-1)*(n_elements1+1),3) = 4;
+            vertices(j+(i-1)*(n_elements1+1),4) = 1;
             vertices(j+i*(n_elements1+1),3) = 4;
         else
             elements(count,:) = [j+(i-1)*(n_elements1+1) j+i*(n_elements1+1) j+i*(n_elements1+1)+1 0];
@@ -85,6 +88,7 @@ function [mesh] = create_mesh(L,H,n_elements1,n_elements2)
             elements(count,:) = [j+(i-1)*(n_elements1+1) j+1+(i-1)*(n_elements1+1) j+1+i*(n_elements1+1) 2];
             vertices(j+1+(i-1)*(n_elements1+1),3) = 2;
             vertices(j+1+i*(n_elements1+1),3) = 2;
+            vertices(j+1+i*(n_elements1+1),4) = 2;
         else
             elements(count,:) = [j+(i-1)*(n_elements1+1) j+1+(i-1)*(n_elements1+1) j+1+i*(n_elements1+1) 0];
         end
@@ -96,6 +100,7 @@ function [mesh] = create_mesh(L,H,n_elements1,n_elements2)
             elements(count,:) = [j+(i-1)*(n_elements1+1) j+i*(n_elements1+1) j+i*(n_elements1+1)+1 4];
             vertices(j+(i-1)*(n_elements1+1),3) = 4;
             vertices(j+i*(n_elements1+1),3) = 4;
+            vertices(j+i*(n_elements1+1),4) = 3;
         else
             elements(count,:) = [j+(i-1)*(n_elements1+1) j+i*(n_elements1+1) j+i*(n_elements1+1)+1 3];
             vertices(j+i*(n_elements1+1),3) = 3;

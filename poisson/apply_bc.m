@@ -9,11 +9,17 @@ disp('Applying boundary conditions');
 tic 
 for i = 1:n_nodes
     if (nodes(i,3)~=0)
+        
         if (bc_flags(nodes(i,3)))
             vd = dirichlet_functions(nodes(i,:)');
             A(i,:) = zeros(1,n_nodes);
             A(i,i) = 1;
             b(i) = vd(nodes(i,3));
+        elseif (nodes(i,4) ~= 0 && bc_flags(nodes(i,4)))
+            vd = dirichlet_functions(nodes(i,:)');
+            A(i,:) = zeros(1,n_nodes);
+            A(i,i) = 1;
+            b(i) = vd(nodes(i,4));
         end
     end
 end

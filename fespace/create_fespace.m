@@ -13,30 +13,6 @@ if (polydegree == 'P1')
     fespace.functions = @(x) [1-x(1)-x(2);x(1);x(2)];
     fespace.grads = @(x) [-1 -1; 1 0; 0 1]';
 elseif (polydegree == 'P2')
-%     n_elements = size(mesh.elements,1);
-%     nodes = [];
-%     for i = 1:n_elements
-%         indices = mesh.elements(i,1:3);
-%         x1 = mesh.vertices(indices(1),:);
-%         x2 = mesh.vertices(indices(2),:);
-%         x3 = mesh.vertices(indices(3),:);
-% 
-%         new_node = x1;
-%         nodes = [nodes; x1];
-%     end
-%     fespace.nodes = mesh.vertices;
-%     n_elements_x = size(mesh.X,1)-1;
-%     n_elements_y = size(mesh.Y,1)-1;
-%     n_new_nodes = n_elements_x * (n_elements_y + 1) + ...
-%                   (2 * n_elements_x + 1) * n_elements_y;
-%     new_nodes = zeros(n_new_nodes,1);
-    
-%     x = mesh.X(1:end-1,1) + (mesh.X(2,1)-mesh.X(1,1))/2;
-%     y = mesh.Y(1,1:end-1) + (mesh.Y(2,1)-mesh.Y(1,1))/2;
-%     
-%     [X,Y] = meshgrid(x,y);
-%     
-
     n_elements = size(mesh.elements,1);
     n_vertices = size(mesh.vertices,1);
     
@@ -70,7 +46,6 @@ elseif (polydegree == 'P2')
                 nodes(count,:) = [(x1(1:2) + x2(1:2))/2 bc 0];
                 count = count + 1;
             end
-            %new_connectivity([1+2*(k-1) 2+2*(k-1)]) = [index1 aux(index1,index2)];
             new_connectivity([k 3+k]) = [indices(index1) aux(indices(index1),indices(index2))];
         end
         fespace.connectivity(i,:) = [new_connectivity mesh.elements(i,4)];
@@ -78,22 +53,27 @@ elseif (polydegree == 'P2')
     fespace.nodes = nodes;
     fespace.mesh = mesh;
     fespace.n_functions_per_element = 6;
-%     c = [2 2 4 -3 -3 1; -4 0 -4 4 0 0; 2 0 0 -1 0 0; 0 0 4 0 0 0; 0 2 0 0 -1 0; 0 -4 -4 0 4 0];
-%     fespace.functions = @(x) c * [x(1)^2; x(2)^2; x(1)*x(2);x(1);x(2);1];
-%     fespace.grads = @(x) [4*x(1)+4*x(2)-3 4*x(1)+4*x(2)-3; ...
-%                           -8*x(1)-4*x(2)+4 -4*x(1); ...
-%                           4*x(1)-1 0; ...
-%                           x(2) x(1); ...
-%                           0 4*x(2)-1; ...
-%                           -4*x(2) -8*x(2)-4*x(1)+4 ]';
     c = [2 2 4 -3 -3 1; 2 0 0 -1 0 0; 0 2 0 0 -1 0; -4 0 -4 4 0 0; 0 0 4 0 0 0; 0 -4 -4 0 4 0];
     fespace.functions = @(x) c * [x(1)^2; x(2)^2; x(1)*x(2);x(1);x(2);1];
     fespace.grads = @(x) [4*x(1)+4*x(2)-3 4*x(1)+4*x(2)-3; ...
                           4*x(1)-1 0; ...
                           0 4*x(2)-1; ...
                           -8*x(1)-4*x(2)+4 -4*x(1); ...
-                          x(2) x(1); ...
+                          4*x(2) 4*x(1); ...
                           -4*x(2) -8*x(2)-4*x(1)+4 ]';
+                      
+% plot the basis functions                      
+%     x = linspace(0,1,10);
+%     y = linspace(0,1,10);
+%     [X,Y] = meshgrid(x,y);
+%     for index = 1:6
+%         close all
+%         surf(X,Y,c(index,1)*X.^2 + c(index,2)*Y.^2 + c(index,3)*X.*Y + c(index,4)*X + c(index,5)*Y + c(index,6)*X.^0,'EdgeColor','none','LineStyle','none','FaceLighting','phong');
+%         hold on
+%         plot([0 0.5 1 0.5 0 0], [0 0 0 0.5 1 0.5], '.r','Markersize',20);
+%         hold off
+%         pause()
+%     end
                     
 else
     error([polydegree, ' is not a valid polynomial degree!']);

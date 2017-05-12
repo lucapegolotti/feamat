@@ -3,10 +3,10 @@ close all
 clc
 
 % Set dimension of the domain and parameters of the mesh
-L = 1;
+L = 2;
 H = 1;
 
-n2 = 20;
+n2 = 30;
 n1 = n2*L;
 
 % Create and display the mesh
@@ -25,10 +25,7 @@ poly_degree = 'P2';
 fespace = create_fespace(mesh,poly_degree,bc);
 
 % Assemble matrix and rhs
-[A,b] =   assembler_poisson(f,mu,fespace,neumann_functions);
-
-% Apply Dirichlet boundary conditions
-[A,b] = apply_bc(A,b,fespace,dirichlet_functions);
+[A,b] =   assembler_poisson(f,mu,fespace,dirichlet_functions,neumann_functions);
 
 % Solve the linear system
 sol = A\b;
@@ -81,14 +78,16 @@ for i = 1:3
     fespace = create_fespace(mesh,poly_degree,bc);
 
     % Assemble matrix and rhs
-    [A,b] = assembler_poisson(f,mu,fespace);
-
-    % Apply Dirichlet boundary conditions
-    [A,b] = apply_bc(A,b,fespace,dirichlet_functions);
+    [A,b] = assembler_poisson(f,mu,fespace,dirichlet_functions);
 
     % Solve the linear system
+    tic
+    disp(['Resolution of linear system']);
     sol = A\b;
-
+    elapsed = toc;
+    disp(['Elapsed time = ', num2str(elapsed),' s']);
+    disp('------------------------------');
+    
     l2error = compute_error(fespace,sol,solex,gradex,'L2');
     l2norm = compute_norm(fespace,sol,'L2');
 
@@ -118,7 +117,7 @@ minh1 = min(errh1);
 maxl2 = max(errl2);
 maxh1 = max(errh1);
 
-legend('L2 error','h^2','H1 error','h','Location','Southeast');
+legend('L2 error',['h^',num2str(order+1)],'H1 error',['h^',num2str(order)],'Location','Southeast');
 pbaspect([1 1 1]);
 axis([min(h) max(h) min([minl2 minh1]) max([maxl2 maxh1])])
 set(gca,'Fontsize',25);

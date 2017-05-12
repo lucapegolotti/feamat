@@ -5,7 +5,7 @@ n_nodes = size(A,1);
 nodes = fespace.nodes;
 bc_flags = fespace.bc;
 
-disp('Applying boundary conditions');
+disp('Applying Dirichlet boundary conditions');
 tic 
 for i = 1:n_nodes
     if (nodes(i,3)~=0)

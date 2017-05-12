@@ -1,7 +1,7 @@
 function [fespace] = create_fespace(mesh,polydegree,bc_flags)
 
 fespace.degree = polydegree;
-% bcs are not enfornced at the level of the finite element space;
+% bcs are not enforced at the level of the finite element space;
 % they are enforced on the assembled matrix of the system
 fespace.bc = bc_flags;
 
@@ -16,7 +16,6 @@ elseif (polydegree == 'P2')
     n_elements = size(mesh.elements,1);
     n_vertices = size(mesh.vertices,1);
     
-   
     aux = sparse(n_vertices,n_vertices);
         
     nodes = [mesh.vertices; zeros(size(mesh.vertices))];

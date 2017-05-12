@@ -27,14 +27,14 @@ disp('Building system');
 tic 
 
 for i = 1:n_elements
-    indices = connectivity(i,1:3);
+    indices = connectivity(i,:);
     x1 = vertices(indices(1),1:2)';
     x2 = vertices(indices(2),1:2)';
     x3 = vertices(indices(3),1:2)';
     
     % if boundary element, find vertices that are on edges
     if (thereisneumann)
-        if (connectivity(i,4) > 0)
+        if (connectivity(i,end) > 0)
             if (vertices(indices(1),3) > 0 && vertices(indices(2),3) > 0)
                 x1_edge = x1;
                 x2_edge = x2;

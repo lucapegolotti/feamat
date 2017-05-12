@@ -13,39 +13,100 @@ n1 = n2*L;
 mesh = create_mesh(L,H,n1,n2);
 draw_mesh(mesh);
 
-solex = @(x,y) sin(pi*x).*sin(pi*y);
+% f = @(x) 2*pi^2*sin(pi*x(1))*sin(pi*x(2));
+% mu = @(x) cos(x(2));
+% dirichlet_functions = @(x) [0;1;0;1-x(2)];
+% neumann_functions = @(x) [-1;0;0;0];
+% 
+% % Create finite element space
+% bc = [0 1 0 1]; 
 
 f = @(x) 2*pi^2*sin(pi*x(1))*sin(pi*x(2));
-mu = @(x) 1;
-dirichlet_functions = @(x) [0;1;0;1-x(2)];
-neumann_functions = @(x) [-1;0;0;0];
+mu = @(x) cos(x(2));
+dirichlet_functions = @(x) [0;0;0;0];
+neumann_functions = @(x) [0;0;0;0];
 
 % Create finite element space
-bc = [0 1 0 1]; 
+bc = [1 1 1 1]; 
 
-poly_degree = 'P1';
+poly_degree = 'P2';
 fespace = create_fespace(mesh,poly_degree,bc);
 
 % Assemble matrix and rhs
-[A,b] = assembler_poisson(f,mu,fespace,neumann_functions);
+[A,b] =   assembler_poisson(f,mu,fespace,neumann_functions);
 
 % Apply Dirichlet boundary conditions
 [A,b] = apply_bc(A,b,fespace,dirichlet_functions);
 
 % Solve the linear system
-sol = A\b;
+sol1 = A\b;
 
 n1 = size(mesh.X,1);
 n2 = size(mesh.X,2);
 
 figure
-surf(mesh.X,mesh.Y,reshape(sol,n1,n2),'EdgeColor','none','LineStyle','none','FaceLighting','phong');
+plot_solution_on_fespace(fespace,sol1)
+%surf(mesh.X,mesh.Y,reshape(sol,n1,n2),'EdgeColor','none','LineStyle','none','FaceLighting','phong');
 pbaspect([1 1 1])
 
 
-l2norm = compute_norm(fespace,sol,'L2');
+% l2norm = compute_norm(fespace,sol,'L2');
+% 
+% display(['Norm = ', num2str(l2norm)]);
 
-display(['Norm = ', num2str(l2norm)]);
+clc
+
+% Set dimension of the domain and parameters of the mesh
+L = 1;
+H = 1;
+
+n2 = 20;
+n1 = n2*L;
+
+% Create and display the mesh
+mesh = create_mesh(L,H,n1,n2);
+%draw_mesh(mesh);
+
+% f = @(x) 2*pi^2*sin(pi*x(1))*sin(pi*x(2));
+% mu = @(x) cos(x(2));
+% dirichlet_functions = @(x) [0;1;0;1-x(2)];
+% neumann_functions = @(x) [-1;0;0;0];
+% 
+% % Create finite element space
+% bc = [0 1 0 1]; 
+
+f = @(x) 2*pi^2*sin(pi*x(1))*sin(pi*x(2));
+mu = @(x) cos(x(2));
+dirichlet_functions = @(x) [0;0;0;0];
+neumann_functions = @(x) [0;0;0;0];
+
+% Create finite element space
+bc = [1 1 1 1]; 
+
+poly_degree = 'P1';
+fespace = create_fespace(mesh,poly_degree,bc);
+
+% Assemble matrix and rhs
+[A,b] =   assembler_poisson(f,mu,fespace,neumann_functions);
+
+% Apply Dirichlet boundary conditions
+[A,b] = apply_bc(A,b,fespace,dirichlet_functions);
+
+% Solve the linear system
+sol2 = A\b;
+
+n1 = size(mesh.X,1);
+n2 = size(mesh.X,2);
+
+figure
+plot_solution_on_fespace(fespace,sol2)
+%surf(mesh.X,mesh.Y,reshape(sol,n1,n2),'EdgeColor','none','LineStyle','none','FaceLighting','phong');
+pbaspect([1 1 1])
+
+
+% l2norm = compute_norm(fespace,sol,'L2');
+% 
+% display(['Norm = ', num2str(l2norm)]);
 
 %% Here we check the convergence of the error
 clear all
@@ -67,7 +128,7 @@ errl2 = [];
 errh1 = [];
 h = [];
 
-for i = 1:5
+for i = 1:3
 
     n2 = 5*2^(i-1);
     n1 = n2*L;
@@ -80,7 +141,7 @@ for i = 1:5
     % Create finite element space
     bc = [1 1 1 1]; 
 
-    poly_degree = 'P1';
+    poly_degree = 'P2';
     fespace = create_fespace(mesh,poly_degree,bc);
 
     % Assemble matrix and rhs

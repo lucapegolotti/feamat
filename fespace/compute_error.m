@@ -16,7 +16,7 @@ if (type == 'L2')
     
     error = 0;
     for i = 1:n_elements
-        indices = connectivity(i,1:3);
+        indices = connectivity(i,:);
         x1 = vertices(indices(1),1:2)';
         x2 = vertices(indices(2),1:2)';
         x3 = vertices(indices(3),1:2)';
@@ -46,7 +46,7 @@ elseif (type == 'H1')
     
     error = 0;
     for i = 1:n_elements
-        indices = connectivity(i,1:3);
+        indices = connectivity(i,:);
         x1 = vertices(indices(1),1:2)';
         x2 = vertices(indices(2),1:2)';
         x3 = vertices(indices(3),1:2)';

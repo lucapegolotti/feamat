@@ -3,35 +3,37 @@ close all
 clc
 
 % Set dimension of the domain and parameters of the mesh
-L = 2;
+L = 1;
 H = 1;
 
-n2 = 30;
+n2 = 20;
 n1 = n2*L;
 
 % Create and display the mesh
 mesh = create_mesh(L,H,n1,n2);
 draw_mesh(mesh);
 
-f = @(x) 2*pi^2*sin(pi*x(1))*sin(pi*x(2));
-mu = @(x) cos(x(2));
-dirichlet_functions = @(x) [0;1;0;1-x(2)];
-neumann_functions = @(x) [-1;0;0;0];
+% f = @(x) 2*pi^2*sin(pi*x(1))*sin(pi*x(2));
+% mu = @(x) cos(x(2));
+% dirichlet_functions = @(x) [0;1;0;1-x(2)];
+% neumann_functions = @(x) [-1;0;0;0];
+
+f = @(x) 0;
+mu = @(x) 1;
+dirichlet_functions = @(x) [0;0;0;x(2)*(1-x(2))];
+neumann_functions = @(x) [0;0;0;0];
 
 % Create finite element space
-bc = [0 1 0 1]; 
+bc = [1 0 1 1]; 
 
 poly_degree = 'P2';
 fespace = create_fespace(mesh,poly_degree,bc);
 
 % Assemble matrix and rhs
-[A,b] =   assembler_poisson(f,mu,fespace,dirichlet_functions,neumann_functions);
+[A,b] =   assembler_poisson(fespace,f,mu,dirichlet_functions,neumann_functions);
 
 % Solve the linear system
 sol = A\b;
-
-n1 = size(mesh.X,1);
-n2 = size(mesh.X,2);
 
 figure
 plot_solution_on_fespace(fespace,sol)
@@ -78,7 +80,7 @@ for i = 1:3
     fespace = create_fespace(mesh,poly_degree,bc);
 
     % Assemble matrix and rhs
-    [A,b] = assembler_poisson(f,mu,fespace,dirichlet_functions);
+    [A,b] = assembler_poisson(fespace,f,mu,dirichlet_functions);
 
     % Solve the linear system
     tic

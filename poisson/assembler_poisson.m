@@ -1,4 +1,4 @@
-function [A,b] = assembler_poisson(fun,mu,fespace,dirichlet_functions,neumann_functions)
+function [A,b] = assembler_poisson(fespace,fun,mu,dirichlet_functions,neumann_functions)
 tic 
 bc_flags = fespace.bc;
 

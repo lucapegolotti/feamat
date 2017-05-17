@@ -33,7 +33,7 @@ for i = 1:n_elements
             x2_edge = x1;
             transfgp_1d_to_2d = @(x) [0;-1]/2*x + [0;1]/2;
         else
-            error('An error occured in boundary element detection!');
+            error('An error occurred in boundary element detection!');
         end
     end
 

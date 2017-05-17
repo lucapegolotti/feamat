@@ -7,4 +7,4 @@ addpath(genpath([curfolder,'fespace']))
 addpath(genpath([curfolder,'matrices']))
 addpath(genpath([curfolder,'poisson']))
 addpath(genpath([curfolder,'core']))
-addpath(genpath([curfolder,'steady stokes']));
+addpath(genpath([curfolder,'stokes']));

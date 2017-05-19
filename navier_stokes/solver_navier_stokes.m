@@ -1,4 +1,4 @@
-function [solution] = solver_unsteady_stokes(fespace_u,fespace_p,t0,T,dt,fun,u0,nu,dirichlet_functions,neumann_functions)
+function [solution] = solver_navier_stokes(fespace_u,fespace_p,t0,T,dt,fun,u0,nu,dirichlet_functions,neumann_functions)
 bc_flags_u = fespace_u.bc;
 thereisneumann = 1;
 
@@ -25,10 +25,6 @@ m = assemble_mass(fespace_u);
 zero_mat_u = zeros(n_nodes_u);
 zero_mat_p = zeros(n_nodes_p);
 zero_mat_up = zeros(n_nodes_u,n_nodes_p);
-
-H1 = [A zero_mat_u -B1'];
-H2 = [zero_mat_u A -B2'];
-H3 = [-B1 -B2 zero_mat_p];
 
 M = [m zero_mat_u zero_mat_up; 
      zero_mat_u m zero_mat_up; 
@@ -57,6 +53,11 @@ while (t < T)
     neu1 = @(x) neumann_functions(t,x)'*[1;0];
     neu2 = @(x) neumann_functions(t,x)'*[0;1];
 
+    C = assemble_convective_term(fespace_u,u);
+    
+    H1 = [A+C zero_mat_u -B1'];
+    H2 = [zero_mat_u A+C -B2'];
+    H3 = [-B1 -B2 zero_mat_p];
 
 
     b1 = assemble_rhs(fespace_u,fun1);
@@ -64,6 +65,7 @@ while (t < T)
 
     [H1,b1] = apply_dirichlet_bc(H1,b1,fespace_u,dir1);
     [H2(:,n_nodes_u+1:end),b2] = apply_dirichlet_bc(H2(:,n_nodes_u+1:end),b2,fespace_u,dir2);
+    
 
     if (thereisneumann)
        b1 = apply_neumann_bc(fespace_u,b1,neu1); 

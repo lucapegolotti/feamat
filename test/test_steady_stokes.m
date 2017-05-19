@@ -14,11 +14,11 @@ mesh = create_mesh(L,H,n1,n2);
 
 f = @(x) [0;0];
 nu = @(x) 1;
-dirichlet_functions = @(x) [0 0;0 0;0 0;0 1]';
-neumann_functions = @(x) [0 0;0 0;0 0;0 0]';
+dirichlet_functions = @(x) [0 0;0 0;0 0;0 0]';
+neumann_functions = @(x) [0 0;0 0;0 0;1 0]';
 
 % Create finite element space
-bc = [1 0 1 1]; 
+bc = [1 0 1 0]; 
 
 poly_degree = 'P2';
 fespace_u = create_fespace(mesh,poly_degree,bc);

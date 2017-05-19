@@ -35,10 +35,10 @@ if (what == 'U')
     end
     hold on
 
-    q = quiver(fespace_u.mesh.X,fespace_u.mesh.Y,U1./N,U2./N);
+    q = quiver(fespace_u.mesh.X,fespace_u.mesh.Y,U1,U2);
     q.Color = 'black';
     q.LineWidth = 1;
-    q.AutoScaleFactor = 0.5;
+    q.AutoScaleFactor = 0.8;
     hold off
 elseif (what == 'P')
     n_nodes_u = size(fespace_u.nodes,1);

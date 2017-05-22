@@ -19,7 +19,7 @@ nu = @(x) 1;
 % neumann_functions = @(t,x) [0;0;0;0];
 dirichlet_functions = @(t,x) [0 0;0 0;0 0;0 sin(8*t*pi)]';
 % neumann_functions = @(t,x) [0 0;0 0;0 0;-cos(16*pi*t) 0]';
-neumann_functions = @(t,x) [0 0;0 0;0 0;1 0]';
+neumann_functions = @(t,x) [0 0;0 0;0 0; 0]';
 
 
 % Create finite element space

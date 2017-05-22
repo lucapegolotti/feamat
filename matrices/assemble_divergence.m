@@ -13,7 +13,6 @@ vertices = fespace_u.mesh.vertices;
 nodes_u = fespace_u.nodes;
 nlocalfunctions_u = fespace_u.n_functions_per_element;
 
-connectivity_p = fespace_p.connectivity;
 nodes_p = fespace_p.nodes;
 nlocalfunctions_p = fespace_p.n_functions_per_element;
 
@@ -27,7 +26,7 @@ n_nodes_p = size(nodes_p,1);
 B = zeros(n_nodes_p,n_nodes_u);
 
 for i = 1:n_elements
-    indices = connectivity_u(i,:);
+    indices = connectivity_u(i,1:end-1);
     x1 = vertices(indices(1),1:2)';
     x2 = vertices(indices(2),1:2)';
     x3 = vertices(indices(3),1:2)';
@@ -36,7 +35,6 @@ for i = 1:n_elements
     invmat = inv(mattransf);
     
     % transformation from parametric to physical
-    transf = @(x) mattransf*x + x1;       
     dettransf = abs(det(mattransf));
     
     for j = 1:n_gauss

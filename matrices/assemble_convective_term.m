@@ -13,7 +13,7 @@ n_nodes = size(nodes,1);
 C = zeros(n_nodes,n_nodes);
 
 for i = 1:n_elements
-    indices = connectivity(i,:);
+    indices = connectivity(i,1:end-1);
     x1 = vertices(indices(1),1:2)';
     x2 = vertices(indices(2),1:2)';
     x3 = vertices(indices(3),1:2)';
@@ -33,12 +33,8 @@ for i = 1:n_elements
             u1 = u1 + transfun(k)*u_old(indices(k));
             u2 = u2 + transfun(k)*u_old(indices(k)+n_nodes);
         end
-        for k = 1:nlocalfunctions
-            for l = 1:nlocalfunctions
-                convective_element = dettransf*transfgrad(:,k)'*[u1;u2]*weights(j)/2;
-                C(indices(k),indices(l)) = C(indices(k),indices(l)) + convective_element;
-            end
-        end
+        convective_elements = dettransf*transfgrad'*[u1;u2]*transfun'*weights(j)/2;
+        C(indices,indices) = C(indices,indices) + convective_elements;
     end
 end
 

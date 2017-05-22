@@ -1,22 +1,17 @@
-clear all
-close all
-clc
+% clear all
+% close all
+% clc
 
 % Set dimension of the domain and parameters of the mesh
 L = 1;
 H = 1;
 
-n2 = 20;
+n2 = 3;
 n1 = n2*L;
 
 % Create and display the mesh
 mesh = create_mesh(L,H,n1,n2);
 draw_mesh(mesh);
-
-% f = @(x) 2*pi^2*sin(pi*x(1))*sin(pi*x(2));
-% mu = @(x) cos(x(2));
-% dirichlet_functions = @(x) [0;1;0;1-x(2)];
-% neumann_functions = @(x) [-1;0;0;0];
 
 f = @(x) 0;
 mu = @(x) 1;
@@ -26,7 +21,7 @@ neumann_functions = @(x) [0;0;0;0];
 % Create finite element space
 bc = [1 0 1 1]; 
 
-poly_degree = 'P2';
+poly_degree = 'P1';
 fespace = create_fespace(mesh,poly_degree,bc);
 
 % Assemble matrix and rhs
@@ -63,7 +58,7 @@ h = [];
 
 order = 2;
 
-for i = 1:3
+for i = 1:5
 
     n2 = 5*2^(i-1);
     n1 = n2*L;

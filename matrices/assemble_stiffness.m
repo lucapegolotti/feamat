@@ -3,7 +3,6 @@ function [A] = assemble_stiffness(mu,fespace)
 connectivity = fespace.connectivity;
 vertices = fespace.mesh.vertices;
 nodes = fespace.nodes;
-nlocalfunctions = fespace.n_functions_per_element;
 
 n_elements = size(connectivity,1);
 n_nodes = size(nodes,1);
@@ -13,7 +12,7 @@ n_nodes = size(nodes,1);
 A = zeros(n_nodes,n_nodes);
 
 for i = 1:n_elements
-    indices = connectivity(i,:);
+    indices = connectivity(i,1:end-1);
     x1 = vertices(indices(1),1:2)';
     x2 = vertices(indices(2),1:2)';
     x3 = vertices(indices(3),1:2)';
@@ -27,12 +26,8 @@ for i = 1:n_elements
     
     for j = 1:n_gauss
         transfgrad = invmat' * fespace.grads(gp(:,j));
-        for k = 1:nlocalfunctions
-            for l = 1:nlocalfunctions
-                stiffness_element = mu(transf(gp(:,j)))*dettransf*transfgrad(:,k)'*transfgrad(:,l)*weights(j)/2;
-                A(indices(k),indices(l)) = A(indices(k),indices(l)) + stiffness_element;
-            end
-        end
+        stiffness_elements = mu(transf(gp(:,j)))*dettransf*(transfgrad'*transfgrad)*weights(j)/2;
+        A(indices,indices) = A(indices,indices) + stiffness_elements;
     end
 end
 

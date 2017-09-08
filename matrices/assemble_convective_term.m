@@ -33,8 +33,14 @@ for i = 1:n_elements
             u1 = u1 + transfun(k)*u_old(indices(k));
             u2 = u2 + transfun(k)*u_old(indices(k)+n_nodes);
         end
-        convective_elements = dettransf*transfgrad'*[u1;u2]*transfun'*weights(j)/2;
-        C(indices,indices) = C(indices,indices) + convective_elements;
+%         convective_elements = dettransf*transfgrad'*[u1;u2]*transfun'*weights(j)/2;
+%         C(indices,indices) = C(indices,indices)' + convective_elements;
+        for k = 1:nlocalfunctions
+           for l = 1:nlocalfunctions
+               convective_element = dettransf*(transfgrad(1,k)*u1 + transfgrad(2,k)*u2)*transfun(l)*weights(j)/2;
+               C(indices(l),indices(k)) = C(indices(l),indices(k)) + convective_element;
+           end
+        end
     end
 end
 

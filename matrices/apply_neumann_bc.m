@@ -44,7 +44,7 @@ for i = 1:n_elements
         for k = 1:nlocalfunctions
             if (nodes(indices(k),3)>0 && bc_flags(nodes(indices(k),3))==0)
                 nf = neumann_functions(transf1d(gp1d(j)));
-                b(indices(k)) = b(indices(k)) - dtransf*nf(nodes(indices(k),3))*functions(k)*weights1d(j);
+                b(indices(k)) = b(indices(k)) + dtransf*nf(nodes(indices(k),3))*functions(k)*weights1d(j);
             end
         end
     end

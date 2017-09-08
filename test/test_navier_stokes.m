@@ -1,7 +1,6 @@
 clear all
 close all
 clc
-
 % Set dimension of the domain and parameters of the mesh
 L = 4;
 H = 1;
@@ -16,7 +15,7 @@ f = @(t,x) [0;0];
 center_nu = [L/4;H/2]';
 nu = @(x) 1;
 dirichlet_functions = @(t,x) [0 0;0 0;0 0;0 0]';
-neumann_functions = @(t,x) [0 0;0 0;0 0;cos(8*pi*t)*10 0]';
+neumann_functions = @(t,x) [0 0;0 0;0 0;cos(2*pi*t)*10 0]';
 
 % Create finite element space
 bc = [1 0 1 0]; 
@@ -31,6 +30,10 @@ fespace_p = create_fespace(mesh,poly_degree,bc);
 opts.integrate_f = 0;
 opts.integrate_neumann = 1;
 
-sol = solver_navier_stokes(fespace_u,fespace_p,0,1,0.01,f,@(x) [0;0],nu,dirichlet_functions,neumann_functions,opts);
+sol = solver_navier_stokes(fespace_u,fespace_p,0,1,0.05,f,@(x) [0;0], @(x) 0,nu,dirichlet_functions,neumann_functions,opts);
 %%
-visualize_stokes_solution(sol,0.01)
+opts.print = 0;
+opts.namefile = 'data';
+% opts.print_only = 'U';
+opts.print_only = 0;
+visualize_stokes_solution(sol,0.01,opts)

@@ -6,7 +6,7 @@
 L = 1;
 H = 1;
 
-n2 = 3;
+n2 = 8;
 n1 = n2*L;
 
 % Create and display the mesh
@@ -79,7 +79,7 @@ for i = 1:5
 
     % Solve the linear system
     tic
-    disp(['Solution of linear system']);
+    disp(['Resolution of linear system']);
     sol = A\b;
     elapsed = toc;
     disp(['Elapsed time = ', num2str(elapsed),' s']);

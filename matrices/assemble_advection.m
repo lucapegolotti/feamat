@@ -1,4 +1,4 @@
-function [b] = assemble_rhs(fespace,fun)
+function [M] = assemble_advection(c,fespace)
 
 connectivity = fespace.connectivity;
 vertices = fespace.mesh.vertices;
@@ -10,7 +10,7 @@ n_nodes = size(nodes,1);
 
 [gp,weights,n_gauss] = gauss_points2D(2);
 
-b = zeros(n_nodes,1);
+M = zeros(n_nodes,n_nodes);
 
 for i = 1:n_elements
     indices = connectivity(i,1:end-1);
@@ -25,9 +25,10 @@ for i = 1:n_elements
     dettransf = abs(det(mattransf));
     
     for j = 1:n_gauss
-        functions = fespace.functions(gp(:,j));
-        for k = 1:nlocalfunctions
-            b(indices(k)) = b(indices(k)) + dettransf*fun(transf(gp(:,j)))*functions(k)*weights(j)/2;
-        end
+        transffun = fespace.functions(gp(:,j))';
+        advection_element = c(transf(gp(:,j)))*dettransf*(transffun'*transffun)*weights(j)/2;
+        M(indices,indices) = M(indices,indices) + advection_element;
     end
 end
+
+M = sparse(M);

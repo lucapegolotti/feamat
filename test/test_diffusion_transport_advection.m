@@ -6,26 +6,28 @@
 L = 1;
 H = 1;
 
-n2 = 3;
+n2 = 40;
 n1 = n2*L;
 
 % Create and display the mesh
 mesh = create_mesh(L,H,n1,n2);
 draw_mesh(mesh);
 
-f = @(x) 0;
+f = @(x) 1;
 mu = @(x) 1;
-dirichlet_functions = @(x) [0;0;0;x(2)*(1-x(2))];
+b = @(x) x*0 + [5;5];
+c = @(x) 0;
+dirichlet_functions = @(x) [0;0;0;0];
 neumann_functions = @(x) [0;0;0;0];
 
 % Create finite element space
-bc = [1 0 1 1]; 
+bc = [1 1 1 1]; 
 
-poly_degree = 'P1';
+poly_degree = 'P2';
 fespace = create_fespace(mesh,poly_degree,bc);
 
 % Assemble matrix and rhs
-[A,b] =   assembler_poisson(fespace,f,mu,dirichlet_functions,neumann_functions);
+[A,b] =   assembler_diffusion_transport_advection(fespace,f,mu,b,c,dirichlet_functions,neumann_functions);
 
 % Solve the linear system
 sol = A\b;
@@ -45,12 +47,19 @@ clc
 L = 1;
 H = 1;
 
-solex = @(x) sin(pi*x(1)).*sin(pi*x(2));
-gradex = @(x) [cos(pi*x(1)).*sin(pi*x(2));cos(pi*x(2)).*sin(pi*x(1))]*pi;
+solex = @(x) sin(pi*x(1))*sin(pi*x(2))*x(1)*x(2);
+gradex = @(x) [x(2)*sin(pi*x(2))*(sin(pi*x(1)) + pi*x(1)*cos(pi*x(1))); ...
+               x(1)*sin(pi*x(1))*(sin(pi*x(2)) + pi*x(2)*cos(pi*x(2)))];
 
-f = @(x) 2*pi^2*sin(pi*x(1))*sin(pi*x(2));
+f = @(x) -(2*pi*(x(1)*sin(pi*x(1))*cos(pi*x(2)) + x(2)*sin(pi*x(2))*(cos(pi*x(1)) - pi*x(1)*sin(pi*x(1))))) + ...
+           x(2)*sin(pi*x(2))*(sin(pi*x(1)) + pi*x(1)*cos(pi*x(1)));
+       
+
 mu = @(x) 1;
+b = @(x) x*0 + [1;0];
+c = @(x) 0;
 dirichlet_functions = @(x) [0;0;0;0];
+neumann_functions = @(x) [0;0;0;0];
 
 errl2 = [];
 errh1 = [];
@@ -75,12 +84,12 @@ for i = 1:5
     fespace = create_fespace(mesh,poly_degree,bc);
 
     % Assemble matrix and rhs
-    [A,b] = assembler_poisson(fespace,f,mu,dirichlet_functions);
+    [A,rhs] =   assembler_diffusion_transport_advection(fespace,f,mu,b,c,dirichlet_functions,neumann_functions);
 
     % Solve the linear system
     tic
     disp(['Solution of linear system']);
-    sol = A\b;
+    sol = A\rhs;
     elapsed = toc;
     disp(['Elapsed time = ', num2str(elapsed),' s']);
     disp('------------------------------');

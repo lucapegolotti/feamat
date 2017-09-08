@@ -45,21 +45,38 @@ clear all
 clc
 
 % Set dimension of the domain and parameters of the mesh
-L = 1;
-H = 1;
+L = 2;
+H = 2;
 
 solexu1 = @(x) sin(x(2)*pi);
 gradexu1 = @(x) [0; pi*cos(x(2)*pi)];
 
-solexu2 = @(x) 0;
-gradexu2 = @(x) [0;0];
+solexu2 = @(x) cos(x(1)*pi);
+gradexu2 = @(x) [-pi*sin(x(1)*pi);0];
 
-solexp = @(x) -0.5*x(1)^2+0.5;
+solexp = @(x) (-x(1)^2+L^2)*0.5;
 
-f = @(x) [pi^2*sin(x(2)*pi)-x(1);0];
+f = @(x) [pi^2*solexu1(x)+cos(x(1)*pi)*pi*cos(x(2)*pi)-x(1); 
+          pi^2*solexu2(x)+sin(x(2)*pi)*(-pi*sin(x(1)*pi))];
 nu = @(x) 1;
-dirichlet_functions = @(x) [0 0;0 0;0 0;solexu1(x) 0]';
+dirichlet_functions = @(x) [solexu1(x) solexu2(x);
+                            solexu1(x) solexu2(x);
+                            solexu1(x) solexu2(x);
+                            solexu1(x) solexu2(x)]';
 neumann_functions = @(x) [0 0;0 0;0 0;0 0]';
+
+% solexu1 = @(x) sin(x(2)*pi);
+% gradexu1 = @(x) [0; pi*cos(x(2)*pi)];
+% 
+% solexu2 = @(x) 0;
+% gradexu2 = @(x) [0;0];
+% 
+% solexp = @(x) -0.5*x(1)^2+0.5;
+% 
+% f = @(x) [pi^2*sin(x(2)*pi)-x(1);0];
+% nu = @(x) 1;
+% dirichlet_functions = @(x) [0 0;0 0;0 0;solexu1(x) 0]';
+% neumann_functions = @(x) [0 0;0 0;0 0;0 0]';
 
 errul2 = [];
 erruh1 = [];
@@ -67,7 +84,7 @@ errpl2 = [];
 
 h = [];
 
-for i = 1:5
+for i = 1:4
 
     n2 = 5*2^(i-1);
     n1 = n2*L;

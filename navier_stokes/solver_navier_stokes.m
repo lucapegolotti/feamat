@@ -91,7 +91,7 @@ while (T-t>dt/2)
        b2 = apply_neumann_bc(fespace_u,b2,neu2); 
     end
     
-    C = assemble_convective_term(fespace_u,[u(nodes_u1);u(nodes_u2)])*1000;
+    C = assemble_convective_term(fespace_u,[u(nodes_u1);u(nodes_u2)]);
     % apply_dirichlet_bc_matrix(C,fespace_u,0);
     
     H1 = [A+C zero_mat_u -B1_u];

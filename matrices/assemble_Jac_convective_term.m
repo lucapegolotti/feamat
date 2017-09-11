@@ -33,7 +33,7 @@ for i = 1:n_elements
             du1 = du1 + transfgrad(:,k)*u_old(indices(k));
             du2 = du2 + transfgrad(:,k)*u_old(indices(k)+n_nodes);
         end
-        du = [du1 du2];
+        du = [du1 du2]';
         
         for k = 1:nlocalfunctions
             for l = 1:nlocalfunctions

@@ -34,7 +34,6 @@ elseif (polydegree == 'P2')
             x2 = X(index2,:);
             if (aux(indices(index1),indices(index2)) == 0)
                 aux(indices(index1),indices(index2)) = count; 
-                aux(indices(index1),indices(index2)) = count; 
                 bc = 0;
                 for j = 3:4
                     if (x1(j) ~= 0 && (x1(j) == x2(3) || x1(j) == x2(4))) 
@@ -76,6 +75,64 @@ elseif (polydegree == 'P2')
                     
 else
     error([polydegree, ' is not a valid polynomial degree!']);
+end
+
+% create correspondence between points with opposite boundaries (needed for
+% periodic boundary conditions
+
+indices_b1 = [];
+indices_b2 = [];
+indices_b3 = [];
+indices_b4 = [];
+
+nnodes = length(fespace.nodes);
+
+for i = 1:nnodes
+    b = fespace.nodes(i,3);
+    if (b == 1)
+        indices_b1 = [indices_b1; i];
+    elseif (b == 2)
+        indices_b2 = [indices_b2; i];
+    elseif (b == 3)
+        indices_b3 = [indices_b3; i];
+    elseif (b == 4)
+        indices_b4 = [indices_b4; i];
+    end
+    
+        b = fespace.nodes(i,4);
+    if (b == 1)
+        indices_b1 = [indices_b1; i];
+    elseif (b == 2)
+        indices_b2 = [indices_b2; i];
+    elseif (b == 3)
+        indices_b3 = [indices_b3; i];
+    elseif (b == 4)
+        indices_b4 = [indices_b4; i];
+    end
+end
+fespace.periodic_b1 = sparse(nnodes,1);
+fespace.periodic_b1(indices_b1) = indices_b3;
+
+fespace.periodic_b3 = sparse(nnodes,1);
+fespace.periodic_b3(indices_b3) = indices_b1;
+
+fespace.periodic_b2 = sparse(nnodes,1);
+fespace.periodic_b2(indices_b2) = indices_b4;
+
+fespace.periodic_b4 = sparse(nnodes,1);
+fespace.periodic_b4(indices_b4) = indices_b2;
+
+% check if correspondence is correct
+for i = 1:length(indices_b1)
+    if (fespace.nodes(indices_b1(i),1) ~= fespace.nodes(indices_b3(i),1))
+        error('Error in periodic boundary detection!');
+    end
+end
+
+for i = 1:length(indices_b2)
+    if (fespace.nodes(indices_b2(i),2) ~= fespace.nodes(indices_b4(i),2))
+        error('Error in periodic boundary detection!');
+    end
 end
 
 

@@ -1,17 +1,18 @@
 function [mesh] = create_mesh(xp,yp,L,H,n_elements1,n_elements2)
 % Generates rectangular mesh.
 % input= 
-%        xp: x coordinate of the bottom left corner
-%        yp: y coordinate of the bottom left corner
-%        L: length
-%        H: height
-%        n_elements1: number of elements in the x direction
-%        n_elements2: number of elements in the y direction
+%           xp: x coordinate of the bottom left corner
+%           yp: y coordinate of the bottom left corner
+%           L: length
+%           H: height
+%           n_elements1: number of elements in the x direction
+%           n_elements2: number of elements in the y direction
 %
-% output= X: x coordinates of the grid
-%         Y: y coordinates of the grid
-%         vertices: vertices of the mesh
-%         connectivity: connectivity matrix
+% output= 
+%           X: x coordinates of the grid
+%           Y: y coordinates of the grid
+%           vertices: vertices of the mesh
+%           connectivity: connectivity matrix
     
     n_elements = n_elements1 * n_elements2 * 2;
     x = linspace(xp,xp+L,n_elements1+1);

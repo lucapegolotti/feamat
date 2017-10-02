@@ -1,4 +1,4 @@
-function [v] = assemble_vector_lagrange_multiplier(fespace)
+function [v,vt] = assemble_vector_lagrange_multiplier(fespace)
 
 connectivity = fespace.connectivity;
 vertices = fespace.mesh.vertices;
@@ -28,3 +28,6 @@ for i = 1:n_elements
         v(indices) = v(indices) + element';
     end
 end
+
+vt = v';
+v = apply_dirichlet_bc_rhs(v,fespace,@(x) [0;0;0;0]);

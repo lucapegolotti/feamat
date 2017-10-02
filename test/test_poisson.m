@@ -10,7 +10,7 @@ n2 = 3;
 n1 = n2*L;
 
 % Create and display the mesh
-mesh = create_mesh(L,H,n1,n2);
+mesh = create_mesh(0,0,L,H,n1,n2);
 draw_mesh(mesh);
 
 f = @(x) 0;
@@ -68,7 +68,7 @@ for i = 1:5
     n1 = n2*L;
 
     % Create and display the mesh
-    mesh = create_mesh(L,H,n1,n2);
+    mesh = create_mesh(0,0,L,H,n1,n2);
     
     h = [h 1/n2];
 

@@ -25,6 +25,10 @@ if (what == 'U')
     shading interp
     h = colorbar;
     if (nargin >= 5)
+        if (mlim == 0 && Mlim == 0)
+            mlim = 0; 
+            Mlim = 1;
+        end
         set(h,'YLim',[mlim*0.9 Mlim*1.1])
         caxis([ mlim*0.9 Mlim*1.1 ])
         c.LevelList = linspace(mlim,Mlim,20);
@@ -55,6 +59,10 @@ elseif (what == 'P')
     h = colorbar;  
     
     if (nargin >= 5)
+        if (mlim == 0 && Mlim == 0)
+            mlim = 0; 
+            Mlim = 1;
+        end
         set(h,'YLim',[mlim*0.9 Mlim*1.1])
         caxis([ mlim*0.9 Mlim*1.1 ])
     else

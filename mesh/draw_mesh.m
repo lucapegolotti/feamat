@@ -8,6 +8,6 @@ for i = 1:n_el
 end
 
 axis equal
-axis([0 mesh.L 0 mesh.H]);
+axis([mesh.xp mesh.xp+mesh.L mesh.yp mesh.yp+mesh.H]);
 
 end

@@ -1,6 +1,9 @@
-function [mesh] = create_mesh(L,H,n_elements1,n_elements2)
+function [mesh] = create_mesh(xp,yp,L,H,n_elements1,n_elements2)
 % Generates rectangular mesh.
-% input= L: length
+% input= 
+%        xp: x coordinate of the bottom left corner
+%        yp: y coordinate of the bottom left corner
+%        L: length
 %        H: height
 %        n_elements1: number of elements in the x direction
 %        n_elements2: number of elements in the y direction
@@ -11,8 +14,8 @@ function [mesh] = create_mesh(L,H,n_elements1,n_elements2)
 %         connectivity: connectivity matrix
     
     n_elements = n_elements1 * n_elements2 * 2;
-    x = linspace(0,L,n_elements1+1);
-    y = linspace(0,H,n_elements2+1);
+    x = linspace(xp,xp+L,n_elements1+1);
+    y = linspace(yp,yp+H,n_elements2+1);
     
     [X,Y] = meshgrid(x,y);
     X = X';
@@ -109,6 +112,8 @@ function [mesh] = create_mesh(L,H,n_elements1,n_elements2)
     
     mesh.vertices = vertices;
     mesh.elements = elements;
+    mesh.xp = xp;
+    mesh.yp = yp;
     mesh.X = X;
     mesh.Y = Y;
     mesh.L = L;

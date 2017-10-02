@@ -1,7 +1,7 @@
 clear allc
 clc
 
-mesh = create_mesh(1,1,2,2);
+mesh = create_mesh(0,0,1,1,2,2);
 
 bc = [0 0 0 0];
 

@@ -9,7 +9,7 @@ n2 = 20;
 n1 = 20;
 
 % Create and display the mesh
-mesh = create_mesh(L,H,n1,n2);
+mesh = create_mesh(0,0,L,H,n1,n2);
 
 f = @(t,x) [0;0];
 f_dt = @(t,x) [0;0];
@@ -54,7 +54,7 @@ n2 = 10;
 n1 = 10;
 
 % Create and display the mesh
-mesh = create_mesh(L,H,n1,n2);
+mesh = create_mesh(0,0,L,H,n1,n2);
 
 % Exact solution
 uex = @(t,x) sin(t*pi)*(x(2)-L).^3;

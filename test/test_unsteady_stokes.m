@@ -10,7 +10,7 @@ n2 = 20;
 n1 = 20;
 
 % Create and display the mesh
-mesh = create_mesh(L,H,n1,n2);
+mesh = create_mesh(0,0,L,H,n1,n2);
 
 f = @(t,x) [0;0];
 center_nu = [L/4;H/2]';
@@ -19,11 +19,11 @@ nu = @(x) 1;
 % neumann_functions = @(t,x) [0;0;0;0];
 dirichlet_functions = @(t,x) [0 0;0 0;0 0;0 sin(8*t*pi)]';
 % neumann_functions = @(t,x) [0 0;0 0;0 0;-cos(16*pi*t) 0]';
-neumann_functions = @(t,x) [0 0;0 0;0 0; 0]';
+neumann_functions = @(t,x) [0 0;0 0;0 0;0 0]';
 
 
 % Create finite element space
-bc = [1 0 1 0]; 
+bc = [1 0 1 1]; 
 
 poly_degree = 'P2';
 fespace_u = create_fespace(mesh,poly_degree,bc);

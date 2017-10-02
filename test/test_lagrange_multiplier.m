@@ -84,6 +84,6 @@ plot_solution_on_fespace(fespace,sol)
 pbaspect([1 1 1])
 
 integral = compute_integral_over_boundary(sol,fespace,1);
-display(['Integral = ', num2str(integral)]);
+display(['Integral over boundary = ', num2str(integral)]);
 
 display(['Lagrange multiplier = ', num2str(lmult)]);

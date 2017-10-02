@@ -8,4 +8,6 @@ fespace.bc = artificial_bc;
 
 v = apply_neumann_bc(fespace,v,@(x) [1;1;1;1]); % attention, this may work only with scalar problems
 vt = v';
+fespace.bc = truebc;
+
 v = apply_dirichlet_bc_rhs(v,fespace,@(x) [0;0;0;0]);

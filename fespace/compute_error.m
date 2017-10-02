@@ -1,4 +1,4 @@
-function error = compute_error(fespace,values,fexact,gradexact,type)
+function err = compute_error(fespace,values,fexact,gradexact,type)
 
 connectivity = fespace.connectivity;
 vertices = fespace.mesh.vertices;
@@ -11,10 +11,7 @@ nlocalfunctions = fespace.n_functions_per_element;
 
 
 if (type == 'L2')
-    disp('Computing L2 error');
-    tic 
-    
-    error = 0;
+    err = 0;
     for i = 1:n_elements
         indices = connectivity(i,:);
         x1 = vertices(indices(1),1:2)';
@@ -33,18 +30,14 @@ if (type == 'L2')
             for k = 1:nlocalfunctions
                 value_in_gp = value_in_gp + values(indices(k))*functions(k);
             end
-            error = error + dettransf*(value_in_gp-fexact(transf(gp(:,j))))^2*weights(j)/2;
+            err = err + dettransf*(value_in_gp-fexact(transf(gp(:,j))))^2*weights(j)/2;
         end
     end  
-    error = sqrt(error);
-    elapsed = toc;
-    disp(['Elapsed time = ', num2str(elapsed),' s']);
-    disp('------------------------------');
+    err = sqrt(err);
 elseif (type == 'H1')
-  disp('Computing H1 error');
-    tic 
+ 
     
-    error = 0;
+    err = 0;
     for i = 1:n_elements
         indices = connectivity(i,:);
         x1 = vertices(indices(1),1:2)';
@@ -69,21 +62,15 @@ elseif (type == 'H1')
                 value_in_gp_grad = value_in_gp_grad + values(indices(k))*grads(:,k);
             end
             gradex = gradexact(transf(gp(:,j)));
-            error = error + dettransf*((value_in_gp_f-fexact(transf(gp(:,j))))^2 + (value_in_gp_grad(1)-gradex(1))^2 + (value_in_gp_grad(2)-gradex(2))^2)*weights(j)/2;
+            err = err + dettransf*((value_in_gp_f-fexact(transf(gp(:,j))))^2 + (value_in_gp_grad(1)-gradex(1))^2 + (value_in_gp_grad(2)-gradex(2))^2)*weights(j)/2;
         end
     end  
-    error = sqrt(error);
-    elapsed = toc;
-    disp(['Elapsed time = ', num2str(elapsed),' s']);
-    disp('------------------------------');
+    err = sqrt(err);
 elseif (type == 'l2')
     solex = project_function(fespace,fexact);
-
-    error = norm(values-solex);
+    err = norm(values-solex);
 else
     error([type,' error is not implemented!']);
 end
-
-
 end
 

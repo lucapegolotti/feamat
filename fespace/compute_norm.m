@@ -12,9 +12,6 @@ nlocalfunctions = fespace.n_functions_per_element;
 
 
 if (type == 'L2')
-    disp('Computing L2 norm');
-    tic 
-    
     norm = 0;
     for i = 1:n_elements
         indices = connectivity(i,:);
@@ -36,12 +33,8 @@ if (type == 'L2')
         end
     end  
     norm = sqrt(norm);
-    elapsed = toc;
-    disp(['Elapsed time = ', num2str(elapsed),' s']);
-    disp('------------------------------');
+
 elseif (type == 'H1')
-    disp('Computing H1 norm');
-    tic 
     
     norm = 0;
     for i = 1:n_elements
@@ -65,10 +58,6 @@ elseif (type == 'H1')
         end
     end  
     norm = sqrt(norm);
-    elapsed = toc;
-    disp(['Elapsed time = ', num2str(elapsed),' s']);
-    disp('------------------------------');
-    
 else
     error([type,' norm is not implemented!']);
 end

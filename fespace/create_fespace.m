@@ -5,7 +5,7 @@ fespace.degree = polydegree;
 % they are enforced on the assembled matrix of the system
 fespace.bc = bc_flags;
 
-if (polydegree == 'P1') 
+if (polydegree == 'P1')
     fespace.nodes = mesh.vertices;
     fespace.connectivity = mesh.elements;
     fespace.mesh = mesh;
@@ -17,7 +17,7 @@ elseif (polydegree == 'P2')
     n_vertices = size(mesh.vertices,1);
     
     aux = sparse(n_vertices,n_vertices);
-        
+    
     nodes = [mesh.vertices; zeros(size(mesh.vertices))];
     fespace.connectivity = zeros(n_elements,7);
     count = n_vertices + 1;
@@ -33,10 +33,10 @@ elseif (polydegree == 'P2')
             x1 = X(index1,:);
             x2 = X(index2,:);
             if (aux(indices(index1),indices(index2)) == 0)
-                aux(indices(index1),indices(index2)) = count; 
+                aux(indices(index1),indices(index2)) = count;
                 bc = 0;
                 for j = 3:4
-                    if (x1(j) ~= 0 && (x1(j) == x2(3) || x1(j) == x2(4))) 
+                    if (x1(j) ~= 0 && (x1(j) == x2(3) || x1(j) == x2(4)))
                         bc = x1(j);
                     end
                 end
@@ -54,31 +54,15 @@ elseif (polydegree == 'P2')
     c = [2 2 4 -3 -3 1; 2 0 0 -1 0 0; 0 2 0 0 -1 0; -4 0 -4 4 0 0; 0 0 4 0 0 0; 0 -4 -4 0 4 0];
     fespace.functions = @(x) c * [x(1)^2; x(2)^2; x(1)*x(2);x(1);x(2);1];
     fespace.grads = @(x) [4*x(1)+4*x(2)-3 4*x(1)+4*x(2)-3; ...
-                          4*x(1)-1 0; ...
-                          0 4*x(2)-1; ...
-                          -8*x(1)-4*x(2)+4 -4*x(1); ...
-                          4*x(2) 4*x(1); ...
-                          -4*x(2) -8*x(2)-4*x(1)+4 ]';
-                      
-% plot the basis functions                      
-%     x = linspace(0,1,10);
-%     y = linspace(0,1,10);
-%     [X,Y] = meshgrid(x,y);
-%     for index = 1:6
-%         close all
-%         surf(X,Y,c(index,1)*X.^2 + c(index,2)*Y.^2 + c(index,3)*X.*Y + c(index,4)*X + c(index,5)*Y + c(index,6)*X.^0,'EdgeColor','none','LineStyle','none','FaceLighting','phong');
-%         hold on
-%         plot([0 0.5 1 0.5 0 0], [0 0 0 0.5 1 0.5], '.r','Markersize',20);
-%         hold off
-%         pause()
-%     end
-                    
+        4*x(1)-1 0; ...
+        0 4*x(2)-1; ...
+        -8*x(1)-4*x(2)+4 -4*x(1); ...
+        4*x(2) 4*x(1); ...
+        -4*x(2) -8*x(2)-4*x(1)+4 ]';
+    
 else
     error([polydegree, ' is not a valid polynomial degree!']);
 end
-
-% create correspondence between points with opposite boundaries (needed for
-% periodic boundary conditions
 
 indices_b1 = [];
 indices_b2 = [];
@@ -99,7 +83,7 @@ for i = 1:nnodes
         indices_b4 = [indices_b4; i];
     end
     
-        b = fespace.nodes(i,4);
+    b = fespace.nodes(i,4);
     if (b == 1)
         indices_b1 = [indices_b1; i];
     elseif (b == 2)

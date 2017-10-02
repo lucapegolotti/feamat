@@ -29,9 +29,7 @@ function [mesh] = create_mesh(xp,yp,L,H,n_elements1,n_elements2)
     
     disp(['Creating rectangular mesh with ', num2str(n_elements), ...
            ' elements (L = ', num2str(L), ', H = ', num2str(H),')']);
-       
-    tic
-    
+           
     count = 0;
     i = 1;
     for j = 1:n_elements1
@@ -119,10 +117,6 @@ function [mesh] = create_mesh(xp,yp,L,H,n_elements1,n_elements2)
     mesh.Y = Y;
     mesh.L = L;
     mesh.H = H;
-    
-    elapsed = toc;
-    disp(['Elapsed time = ', num2str(elapsed),' s']);
-    disp('------------------------------');
     
 end
 

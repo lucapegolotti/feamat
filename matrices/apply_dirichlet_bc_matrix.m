@@ -6,8 +6,6 @@ dim2 = size(A,2);
 nodes = fespace.nodes;
 bc_flags = fespace.bc;
 
-disp('Applying Dirichlet boundary conditions to matrix');
-tic 
 for i = 1:n_nodes
     if (nodes(i,3)~=0)
         if (bc_flags(nodes(i,3)))
@@ -23,7 +21,3 @@ for i = 1:n_nodes
         end
     end
 end
-    
-elapsed = toc;
-disp(['Elapsed time = ', num2str(elapsed),' s']);
-disp('------------------------------');

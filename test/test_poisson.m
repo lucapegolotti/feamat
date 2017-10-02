@@ -51,7 +51,10 @@ gradex = @(x) [cos(pi*x(1)).*sin(pi*x(2));cos(pi*x(2)).*sin(pi*x(1))]*pi;
 f = @(x) 2*pi^2*sin(pi*x(1))*sin(pi*x(2));
 mu = @(x) 1;
 dirichlet_functions = @(x) [0;0;0;0];
-neumann_functions = @(x) [0;0;pi*sin(pi*x(1))*cos(pi*x(2));-pi*cos(pi*x(1)).*sin(pi*x(2))];
+neumann_functions = @(x) [-pi*sin(pi*x(1)).*cos(pi*x(2));
+                          pi*cos(pi*x(1)).*sin(pi*x(2));
+                          pi*sin(pi*x(1))*cos(pi*x(2));
+                          -pi*cos(pi*x(1)).*sin(pi*x(2))];
 
 errl2 = [];
 errh1 = [];
@@ -70,7 +73,7 @@ for i = 1:5
     h = [h 1/n2];
 
     % Create finite element space
-    bc = [1 1 0 0]; 
+    bc = [1 0 0 0]; 
 
     poly_degree = ['P',num2str(order)];
     fespace = create_fespace(mesh,poly_degree,bc);

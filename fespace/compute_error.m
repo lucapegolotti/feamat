@@ -76,6 +76,10 @@ elseif (type == 'H1')
     elapsed = toc;
     disp(['Elapsed time = ', num2str(elapsed),' s']);
     disp('------------------------------');
+elseif (type == 'l2')
+    solex = project_function(fespace,fexact);
+
+    error = norm(values-solex);
 else
     error([type,' error is not implemented!']);
 end

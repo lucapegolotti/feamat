@@ -18,8 +18,7 @@ function [mesh] = create_mesh(L,H,n_elements1,n_elements2)
     X = X';
     Y = Y';
     vertices = [X(:) Y(:) zeros(length(X(:)),1) zeros(length(X(:)),1)];
-    
-    
+  
     % last column represents group: 1: bottom, 2: right, 3: top, 4: left,
     %                               0: internal
     elements = zeros(n_elements,4);

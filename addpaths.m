@@ -10,4 +10,5 @@ addpath(genpath([curfolder,'diffusion_transport_advection']))
 addpath(genpath([curfolder,'core']))
 addpath(genpath([curfolder,'stokes']));
 addpath(genpath([curfolder,'navier_stokes']));
+addpath(genpath([curfolder,'test']));
 

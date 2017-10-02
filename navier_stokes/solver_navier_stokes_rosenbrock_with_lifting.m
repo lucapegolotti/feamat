@@ -1,4 +1,4 @@
-function [solution] = solver_navier_stokes_rosenbrock(fespace_u,fespace_p,t0,T,dt,fun,fundt,u0,p0,nu,dirichlet_functions, dirichlet_dt, neumann_functions, neumann_dt, method,varargin)
+function [solution] = solver_navier_stokes_rosenbrock_with_lifting(fespace_u,fespace_p,t0,T,dt,fun,fundt,funddt,u0,p0,nu,dirichlet_functions, dirichlet_dt, neumann_functions, neumann_dt, method,varargin)
 integrate_f = 1;
 integrate_neumann = 1;
 
@@ -23,11 +23,6 @@ nodes_u2 = n_nodes_u+1:n_nodes_u*2;
 
 if (length(find(bc_flags_u)) == 4)
     thereisneumann = 0;
-end
-
-thereisperiodic = 0;
-if (length(bc_flags_u == 2) > 0)
-    thereisperiodic = 1;
 end
 
 % set initial condition
@@ -75,6 +70,16 @@ while (T-t>dt/2)
     count = count + 1;
     
     disp(['Time = ',num2str(t+dt)]);
+    
+    % compute lifting and corresponding terms
+    l1 = zeros(n_nodes_u,1);
+    l2 = zeros(n_nodes_u,1);
+    
+    l1 = apply_dirichlet_bc_rhs(l1,fespace_u,@(x) dirichlet_functions(t,x)'*[1;0]);
+    l2 = apply_dirichlet_bc_rhs(l2,fespace_u,@(x) dirichlet_functions(t,x)'*[0;1]);
+    
+    Cl = assemble_convective_term(fespace_u,[l1;l2]);
+    ClJ11 = assemble_convective_term(fespace_
     
     C = assemble_convective_term(fespace_u,u);
     J11 = assemble_Jac_convective_term(fespace_u,u,1,1);
@@ -155,11 +160,6 @@ while (T-t>dt/2)
                b(k) = (dirb1(k)  - uhat(k) - dt*sumstages(k))/(dt*coeffs.gamma(1,1));
                b(k + n_nodes_u) = (dirb2(k) - uhat(k + n_nodes_u) - dt*sumstages(k + n_nodes_u))/(dt*coeffs.gamma(1,1));
             end
-        end
-        
-        if (thereisperiodic)
-            [mat(nodes_u1,:),b(nodes_u1)] = apply_periodic_bc(mat(nodes_u1,:),b(nodes_u1),fespace_u);
-            [mat(nodes_u1,n_nodes_u+1:end),b(nodes_u2)] = apply_periodic_bc(mat(nodes_u1,n_nodes_u+1:end),b(nodes_u2),fespace_u);
         end
         stages(:,j) = mat\b;
     end

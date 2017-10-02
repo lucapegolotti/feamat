@@ -21,11 +21,13 @@ while (count < n_timesteps)
     if (label == 'U')
         plot_solution_vp(fespace_u,fespace_p,u(:,count),'U',[solution.minnorm solution.maxnorm])
         title(['V at t = ',num2str(t)])
+    elseif (label == 'U_dif')
+        plot_solution_vp(fespace_u,fespace_p,u(:,count),'U',[solution.minnorm solution.maxnorm])
     elseif(label == 'P')
         plot_solution_vp(fespace_u,fespace_p,u(:,count),'P',[solution.minp solution.maxp])
         title(['P at t = ',num2str(t)])
     else
-        error('Label is not valid! Must be either U or P');
+        error('Label is not valid! Must be either U, U_dif or P');
     end
     axis([0 L 0 H])
     pbaspect([L H 1])
@@ -62,6 +64,42 @@ while (count < n_timesteps)
         set(h,'YLim',[m*0.9 M*1.1]);
         caxis([ m*0.9 M*1.1 ]);
         c.LevelList = linspace(m,M,20);
+        hold on
+
+        q = quiver(fespace_u.mesh.X,fespace_u.mesh.Y,U1,U2);
+        q.Color = 'black';
+        q.LineWidth = 1;
+        q.AutoScaleFactor = 0.8;
+        hold off
+        axis([0 L 0 H])
+        pbaspect([L H 1])
+    elseif (label == 'U_dif')
+        u1 = zeros(n_vertices,1);
+        u2 = zeros(n_vertices,1);
+
+        for i = 1:n_vertices
+             u1(i) = abs(vexact(vertices(i,1:2),t)'*[1;0]-u(i,count));
+             u2(i) = abs(vexact(vertices(i,1:2),t)'*[0;1]-u(i+size(fespace_u.nodes,1),count));
+        end
+
+        U1 = reshape(u1,n1,n2);
+        U2 = reshape(u2,n1,n2);
+
+        N = sqrt(U1.^2+U2.^2);
+
+        [~,c] = contourf(fespace_u.mesh.X,fespace_p.mesh.Y,N);
+        title(['abs(V - vex) at t = ',num2str(t)])
+        c.LineStyle = 'none';
+        shading interp
+        h = colorbar;
+        mm = min(min(N));
+        MM = max(max(N));
+        if (mm == MM)
+            MM=1;
+        end
+        set(h,'YLim',[mm*0.9 MM*1.1]);
+        caxis([ mm*0.9 MM*1.1 ]);
+        c.LevelList = linspace(mm,MM,20);
         hold on
 
         q = quiver(fespace_u.mesh.X,fespace_u.mesh.Y,U1,U2);

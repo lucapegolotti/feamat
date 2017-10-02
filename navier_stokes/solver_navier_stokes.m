@@ -6,7 +6,6 @@ if (nargin >= 11)
     integrate_neumann = opts.integrate_neumann;
 end
 
-
 bc_flags_u = fespace_u.bc;
 thereisneumann = 1;
 
@@ -18,6 +17,11 @@ nodes_u2 = n_nodes_u+1:n_nodes_u*2;
 
 if (length(find(bc_flags_u)) == 4)
     thereisneumann = 0;
+end
+
+thereisperiodic = 0;
+if (length(bc_flags_u == 2) > 0)
+    thereisperiodic = 1;
 end
 
 % set initial condition
@@ -37,9 +41,9 @@ zero_mat_u = zeros(n_nodes_u);
 zero_mat_p = zeros(n_nodes_p);
 zero_mat_up = zeros(n_nodes_u,n_nodes_p);
 
-M = [m zero_mat_u zero_mat_up; 
-     zero_mat_u m zero_mat_up; 
-     zero_mat_up' zero_mat_up' zero_mat_p];
+M = [m zero_mat_u zero_mat_up;
+    zero_mat_u m zero_mat_up;
+    zero_mat_up' zero_mat_up' zero_mat_p];
 
 % A = apply_dirichlet_bc_matrix(A,fespace_u,1);
 B1_u = B1';
@@ -61,25 +65,25 @@ maxp = 0;
 while (T-t>dt/2)
     count = count + 1;
     t = t + dt;
-
+    
     disp(['Time = ',num2str(t)]);
-
+    
     fun1 = @(x) fun(t,x)'*[1;0];
     fun2 = @(x) fun(t,x)'*[0;1];
     dir1 = @(x) dirichlet_functions(t,x)'*[1;0];
     dir2 = @(x) dirichlet_functions(t,x)'*[0;1];
     neu1 = @(x) neumann_functions(t,x)'*[1;0];
     neu2 = @(x) neumann_functions(t,x)'*[0;1];
-
+    
     % C = assemble_convective_term(fespace_u,u);
     % C = apply_dirichlet_bc_matrix(C,fespace_u,0);
     
-%     C = @(u) apply_dirichlet_bc_matrix(assemble_convective_term(fespace_u,u), ... 
-%                                        fespace_u,0);
+    %     C = @(u) apply_dirichlet_bc_matrix(assemble_convective_term(fespace_u,u), ...
+    %                                        fespace_u,0);
     
     b1 = zeros(n_nodes_u,1);
     b2 = zeros(n_nodes_u,1);
-
+    
     if (integrate_f)
         b1 = assemble_rhs(fespace_u,fun1);
         b2 = assemble_rhs(fespace_u,fun2);
@@ -87,8 +91,8 @@ while (T-t>dt/2)
     
     
     if (thereisneumann && integrate_neumann)
-       b1 = apply_neumann_bc(fespace_u,b1,neu1); 
-       b2 = apply_neumann_bc(fespace_u,b2,neu2); 
+        b1 = apply_neumann_bc(fespace_u,b1,neu1);
+        b2 = apply_neumann_bc(fespace_u,b2,neu2);
     end
     
     C = assemble_convective_term(fespace_u,[u(nodes_u1);u(nodes_u2)]);
@@ -98,21 +102,26 @@ while (T-t>dt/2)
     H2 = [zero_mat_u A+C -B2_u];
     H3 = [-B1 -B2 zero_mat_p];
     H = [H1;H2;H3];
-
+    
     mat = 1/dt * M + H;
     mat(nodes_u1,nodes_u1) = apply_dirichlet_bc_matrix(mat(nodes_u1,nodes_u1),fespace_u,1);
     mat(nodes_u2,nodes_u2) = apply_dirichlet_bc_matrix(mat(nodes_u2,nodes_u2),fespace_u,1);
-
+    
     b = [b1;b2;zeros(n_nodes_p,1)];
     
     rhs = b + 1/dt * M * u;
     
-%     b1 = apply_dirichlet_bc_rhs(b1,fespace_u,dir1);
-%     b2 = apply_dirichlet_bc_rhs(b2,fespace_u,dir2);
+    %     b1 = apply_dirichlet_bc_rhs(b1,fespace_u,dir1);
+    %     b2 = apply_dirichlet_bc_rhs(b2,fespace_u,dir2);
     
     rhs(nodes_u1) = apply_dirichlet_bc_rhs(rhs(nodes_u1),fespace_u,dir1);
     rhs(nodes_u2) = apply_dirichlet_bc_rhs(rhs(nodes_u2),fespace_u,dir2);
     % u = fixed_point(u,n_nodes_u,fespace_u,M,H,b,dt,1e-9,10);
+    
+    if (thereisperiodic)
+        [mat(nodes_u1,:),rhs(nodes_u1)] = apply_periodic_bc(mat(nodes_u1,:),rhs(nodes_u1),fespace_u);
+        [mat(nodes_u1,n_nodes_u+1:end),rhs(nodes_u2)] = apply_periodic_bc(mat(nodes_u1,n_nodes_u+1:end),rhs(nodes_u2),fespace_u);
+    end
     
     u = mat\rhs;
     

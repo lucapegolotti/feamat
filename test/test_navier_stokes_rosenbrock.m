@@ -2,7 +2,7 @@ clear all
 close all
 clc
 % Set dimension of the domain and parameters of the mesh
-L = 1;
+L = 1; 
 H = 1;
 
 n2 = 20;
@@ -251,4 +251,4 @@ legend('Global error on ul2','Global error on uh1','Global error on pl2','\Delta
 
 
 %%
-plot_exact_solution_vs_approx(@(x,t) [uex(t,x);vex(t,x)],@(t,x) pex(x,t), sol, 'U')
+plot_exact_solution_vs_approx(@(x,t) [uex(t,x);vex(t,x)],@(t,x) pex(x,t), sol, 'U_dif')

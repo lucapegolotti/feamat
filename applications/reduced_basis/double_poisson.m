@@ -1,3 +1,7 @@
+%% solving the poisson problem on two separate domains with rb
+%  The solution is glued togheter by imposing the continuity of the
+%  integrals
+
 clear all
 clc
 
@@ -7,7 +11,7 @@ yp1 = 0;
 L1 = 0.5;
 H1 = 1;
 
-mesh1 = create_mesh(xp1,yp1,L1,H1,20,20);
+mesh1 = create_mesh(xp1,yp1,L1,H1,20,30);
 
 % create mesh on right subdomain
 xp2 = 0.5;
@@ -139,4 +143,6 @@ sol = A\b;
 figure
 plot_solution_on_fespace(fespace,sol)
 pbaspect([1 1 1])
+
+
 

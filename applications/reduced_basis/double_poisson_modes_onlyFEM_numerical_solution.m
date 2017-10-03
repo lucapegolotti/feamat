@@ -4,6 +4,20 @@
 clear all
 clc
 
+fun = @(x) sin(x(1))*cos(10*x(2))*exp(x(1))+log(x(2));
+mu = pi;
+
+% L2 error of full solution
+disp('Computing exact solution');
+
+mesh = create_mesh(0,0,1,1,100,100);
+
+fespace = create_fespace(mesh,'P2',[1 1 1 1]);
+[A,b] = assembler_poisson(fespace,fun,@(x) mu,@(x) [0;0;0;0],@(x) [0;0;0;0]);
+
+totalsol = A\b;
+%%
+
 % create mesh on left subdomain
 xp1 = 0;
 yp1 = 0;
@@ -30,12 +44,6 @@ meshes = {};
 meshes{end+1} = mesh1;
 meshes{end+1} = mesh2;
 %draw_multimesh(meshes);
-
-fun = @(x) 2*pi^2*sin(pi*x(1))*sin(pi*x(2));
-uex = @(x) sin(pi*x(1))*sin(pi*x(2));
-% uex = @(x) x(1)*(1-x(1))*x(2)*(1-x(2));
-% fun = @(x) +2*(x(2)-x(2)^2) +2*(x(1)-x(1)^2);
-%fun = @(x) sin(x(1))*cos(x(2));
 
 % solve problems on subdomains
 mu = 1;
@@ -89,23 +97,12 @@ for i = 1:nmodes
     
     hold off
     
-    err1 = compute_error(fespace1,sol1,uex,@(x) [0;0],'L2');
-    err2 = compute_error(fespace2,sol2,uex,@(x) [0;0],'L2');
-    
-    disp(['Total L2 error = ', num2str(err1 + err2)]);
+    interpsol = interp_2solutions_on_fespace(fespace1,sol1,fespace2,sol2,fespace);
+    err = compute_error(fespace,abs(totalsol-interpsol),@(x)0,@(x)[0;0],'L2');
+    disp(['Total L2 error = ', num2str(err)]);
 
     pause()
 end
 
-% L2 error of full solution
-disp('Computing L2 error of the full solution');
 
-mesh = create_mesh(0,0,1,1,n1x+n2x,n1y+n2y);
 
-fespace = create_fespace(mesh,'P2',[1 1 1 1]);
-[A,b] = assembler_poisson(fespace,fun,@(x) mu,@(x) [0;0;0;0],@(x) [0;0;0;0]);
-
-totalsol = A\b;
-totalerr = compute_error(fespace,totalsol,uex,@(x) [0;0],'L2');
-
-disp(['L2 error of full FEM solution = ', num2str(totalerr)]);

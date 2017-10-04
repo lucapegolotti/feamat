@@ -9,7 +9,7 @@ n_nodes = size(nodes,1);
 
 [gp,weights,n_gauss] = gauss_points2D(2);
 
-A = zeros(n_nodes,n_nodes);
+A = sparse(n_nodes,n_nodes);
 
 for i = 1:n_elements
     indices = connectivity(i,1:end-1);

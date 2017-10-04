@@ -4,13 +4,13 @@
 clear all
 clc
 
-fun = @(x) sin(x(1))*cos(10*x(2))*exp(x(1))+log(x(2));
+fun = @(x) sin(x(1))*cos(10*x(2))*exp(x(1))+log(x(2))*x(1);
 mu = pi;
 
 % L2 error of full solution
 disp('Computing exact solution');
 
-mesh = create_mesh(0,0,1,1,100,100);
+mesh = create_mesh(0,0,1,1,80,80);
 
 fespace = create_fespace(mesh,'P2',[1 1 1 1]);
 [A,b] = assembler_poisson(fespace,fun,@(x) mu,@(x) [0;0;0;0],@(x) [0;0;0;0]);
@@ -24,10 +24,10 @@ yp1 = 0;
 L1 = 0.5;
 H1 = 1;
 
-n1x = 30;
-n2x = 30;
-n1y = 30;
-n2y = 30;
+n1x = 40;
+n2x = 40;
+n1y = 80;
+n2y = 80;
 
 mesh1 = create_mesh(xp1,yp1,L1,H1,n1x,n1y);
 
@@ -46,7 +46,7 @@ meshes{end+1} = mesh2;
 %draw_multimesh(meshes);
 
 % solve problems on subdomains
-mu = 1;
+mu = pi;
 
 fespace1 = create_fespace(mesh1,'P2',[1 0 1 1]);
 fespace2 = create_fespace(mesh2,'P2',[1 1 1 0]);
@@ -63,7 +63,9 @@ indices2 = n1+1:n1+n2;
 V1 = [];
 V2 = [];
 
-nmodes = 4;
+nmodes = 16;
+
+l2err = [];
 
 for i = 1:nmodes
     disp(['Solving with mode with frequency omega * ',num2str(i)]);
@@ -90,6 +92,7 @@ for i = 1:nmodes
     sol1 = sol(indices1);
     sol2 = sol(indices2);
     
+    figure(1);
     plot_solution_on_fespace(fespace1,sol1)
     hold on
 
@@ -100,9 +103,74 @@ for i = 1:nmodes
     interpsol = interp_2solutions_on_fespace(fespace1,sol1,fespace2,sol2,fespace);
     err = compute_error(fespace,abs(totalsol-interpsol),@(x)0,@(x)[0;0],'L2');
     disp(['Total L2 error = ', num2str(err)]);
+    l2err = [l2err;err];
+    % check convergence of derivatives
+    yy = 0:0.01:1;
+    x1 = 0.499;
+    x2 = 0.5;
+    
+    dudx = zeros(length(yy),1);
+    
+    figure(2)
+    for j = 1:length(dudx)
+        dudx(j) = (interpolate_in_point(fespace1,sol1,x2,yy(j))-interpolate_in_point(fespace1,sol1,x1,yy(j)))/(x2-x1);
+    end
+    plot(yy,dudx)
+    hold on
+    dudx = zeros(length(yy),1);
+    x1 = 0.5;
+    x2 = 0.501;
+    
+    for j = 1:length(dudx)
+        dudx(j) = (interpolate_in_point(fespace2,sol2,x2,yy(j))-interpolate_in_point(fespace2,sol2,x1,yy(j)))/(x2-x1);
+    end
+    plot(yy,dudx)
+    
+    
+    dudx = zeros(length(yy),1);
+    x1 = 0.4995;
+    x2 = 0.5005;
+    for j = 1:length(dudx)
+        dudx(j) = (interpolate_in_point(fespace,totalsol,x2,yy(j))-interpolate_in_point(fespace,totalsol,x1,yy(j)))/(x2-x1);
+    end
+    plot(yy,dudx)
+    title('du/dx over the interface')
+    hold off
+    
+    % check convergence of function at interface
+    x1 = 0.5;
+    
+    u = zeros(length(yy),1);
+    
+    figure(3)
+    for j = 1:length(u)
+        u(j) = interpolate_in_point(fespace1,sol1,x1,yy(j));
+    end
+    plot(yy,u)
+    hold on
+    
+    u = zeros(length(yy),1);
+    
+    for j = 1:length(u)
+        u(j) = interpolate_in_point(fespace2,sol2,x1,yy(j));
+    end
+    plot(yy,u)
+    
 
-    pause()
+    u = zeros(length(yy),1);
+
+    for j = 1:length(u)
+        u(j) = interpolate_in_point(fespace,totalsol,x1,yy(j));
+    end
+    plot(yy,u)
+    title('u at the interface')
+    hold off
+
+    pause(0.1)
 end
 
-
-
+figure(4)
+semilogy(1:nmodes,l2err,'.-','Markersize',10)
+title('Convergence l2 error')
+xlabel('number of modes')
+ylabel('l2 error')

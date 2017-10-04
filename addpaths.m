@@ -11,4 +11,6 @@ addpath(genpath([curfolder,'core']))
 addpath(genpath([curfolder,'stokes']));
 addpath(genpath([curfolder,'navier_stokes']));
 addpath(genpath([curfolder,'test']));
+addpath(genpath([curfolder,'applications/reduced_basis']));
+
 

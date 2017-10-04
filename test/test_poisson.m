@@ -6,7 +6,7 @@
 L = 1;
 H = 1;
 
-n2 = 3;
+n2 = 30;
 n1 = n2*L;
 
 % Create and display the mesh
@@ -16,12 +16,12 @@ draw_mesh(mesh);
 f = @(x) 0;
 mu = @(x) 1;
 dirichlet_functions = @(x) [0;0;0;x(2)*(1-x(2))];
-neumann_functions = @(x) [0;0;0;0];
+neumann_functions = @(x) [0;cos(x(2));0;0];
 
 % Create finite element space
 bc = [1 0 1 1]; 
 
-poly_degree = 'P1';
+poly_degree = 'P2';
 fespace = create_fespace(mesh,poly_degree,bc);
 
 % Assemble matrix and rhs

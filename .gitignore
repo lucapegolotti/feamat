@@ -1,3 +1,4 @@
 *~
 test/data/*
 *.mat
+.DS_Store

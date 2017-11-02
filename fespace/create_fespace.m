@@ -119,5 +119,9 @@ for i = 1:length(indices_b2)
     end
 end
 
+fespace.boundary_nodes = {construct_list_boundary(fespace,1), ...
+                          construct_list_boundary(fespace,2), ...
+                          construct_list_boundary(fespace,3), ...
+                          construct_list_boundary(fespace,4)};
 
 end

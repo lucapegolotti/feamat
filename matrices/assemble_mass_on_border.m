@@ -122,4 +122,7 @@ for i = 1:n_elements
     end
 end
 
+Mg(~any(Mg,2),:) = [];
+Mg(:,~any(Mg,1)) = [];
+
 

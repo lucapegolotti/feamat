@@ -1,4 +1,9 @@
-function b = apply_neumann_bc(fespace,b,neumann_functions)
+function b = apply_neumann_bc(fespace,b,neumann_functions,varargin)
+
+order_gauss = 3;
+if (nargin == 4)
+    order_gauss = varargin{1};
+end
 
 connectivity = fespace.connectivity;
 vertices = fespace.mesh.vertices;
@@ -8,7 +13,7 @@ bc_flags = fespace.bc;
 
 n_elements = size(connectivity,1);
 
-[gp1d,weights1d,n_gauss1d] = gauss_points1D(3);
+[gp1d,weights1d,n_gauss1d] = gauss_points1D(order_gauss);
 
 for i = 1:n_elements
     indices = connectivity(i,:);

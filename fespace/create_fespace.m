@@ -94,6 +94,7 @@ for i = 1:nnodes
         indices_b4 = [indices_b4; i];
     end
 end
+
 fespace.periodic_b1 = sparse(nnodes,1);
 fespace.periodic_b1(indices_b1) = indices_b3;
 
@@ -123,5 +124,4 @@ fespace.boundary_nodes = {construct_list_boundary(fespace,1), ...
                           construct_list_boundary(fespace,2), ...
                           construct_list_boundary(fespace,3), ...
                           construct_list_boundary(fespace,4)};
-
 end

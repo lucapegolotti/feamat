@@ -1,7 +1,7 @@
 clear all
 clc
 
-curfolder='/Users/luca/feamat/';
+curfolder=pwd;
 addpath(genpath([curfolder,'mesh']))
 addpath(genpath([curfolder,'fespace']))
 addpath(genpath([curfolder,'matrices']))

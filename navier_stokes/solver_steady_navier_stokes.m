@@ -27,12 +27,6 @@ if (length(find(bc_flags_u)) == 4)
     thereisneumann = 0;
 end
 
-u1 = zeros(n_nodes_u,1);
-u2 = zeros(n_nodes_u,1);
-p = zeros(n_nodes_p,1);
-
-u = [u1;u2;p];
-
 % assemble constant matrices
 A = assemble_stiffness(nu,fespace_u);
 B1 = assemble_divergence(fespace_u,fespace_p,'dx');
@@ -68,6 +62,14 @@ b1 = apply_dirichlet_bc_rhs(b1,fespace_u,dir1);
 b2 = apply_dirichlet_bc_rhs(b2,fespace_u,dir2);
 
 b = [b1;b2;zeros(n_nodes_p,1)];
+
+% solve Stokes problem to get initial guess
+mat = [apply_dirichlet_bc_matrix(A,fespace_u,1) sparse(n_nodes_u,n_nodes_u) -B1_u; ...
+       sparse(n_nodes_u,n_nodes_u) apply_dirichlet_bc_matrix(A,fespace_u,1) -B2_u; ...
+       -B1 -B2 zero_mat_p];
+u = mat\b;
+u1 = u(nodes_u1);
+u2 = u(nodes_u2);
 
 % perform newtwon iterations until convergence
 tol = 1e-8;

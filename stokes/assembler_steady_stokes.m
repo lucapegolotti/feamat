@@ -23,9 +23,9 @@ B2 = assemble_divergence(fespace_u,fespace_p,'dy');
 b1 = assemble_rhs(fespace_u,fun1);
 b2 = assemble_rhs(fespace_u,fun2);
 
-zero_mat_u = zeros(n_nodes_u);
-zero_mat_p = zeros(n_nodes_p);
-zero_mat_up = zeros(n_nodes_u,n_nodes_p);
+zero_mat_u = sparse(n_nodes_u,n_nodes_u);
+zero_mat_p = sparse(n_nodes_p,n_nodes_p);
+zero_mat_up = sparse(n_nodes_u,n_nodes_p);
 
 H1 = [A zero_mat_u -B1'];
 H2 = [zero_mat_u A -B2'];

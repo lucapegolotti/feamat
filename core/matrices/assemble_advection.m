@@ -10,7 +10,7 @@ n_nodes = size(nodes,1);
 
 [gp,weights,n_gauss] = gauss_points2D(2);
 
-M = zeros(n_nodes,n_nodes);
+M = sparse(n_nodes,n_nodes);
 
 for i = 1:n_elements
     indices = connectivity(i,1:end-1);
@@ -30,5 +30,3 @@ for i = 1:n_elements
         M(indices,indices) = M(indices,indices) + advection_element;
     end
 end
-
-M = sparse(M);

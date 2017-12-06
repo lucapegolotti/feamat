@@ -14,7 +14,7 @@ function [mesh] = create_mesh(xp,yp,L,H,n_elements1,n_elements2)
 %           vertices: vertices of the mesh
 %           connectivity: connectivity matrix
     
-    n_elements = n_elements1 * n_elements2 * 2;
+    n_elements = n_elements1*n_elements2*2;
     x = linspace(xp,xp+L,n_elements1+1);
     y = linspace(yp,yp+H,n_elements2+1);
     
@@ -26,9 +26,6 @@ function [mesh] = create_mesh(xp,yp,L,H,n_elements1,n_elements2)
     % last column represents group: 1: bottom, 2: right, 3: top, 4: left,
     %                               0: internal
     elements = zeros(n_elements,4);
-    
-    disp(['Creating rectangular mesh with ', num2str(n_elements), ...
-           ' elements (L = ', num2str(L), ', H = ', num2str(H),')']);
            
     count = 0;
     i = 1;
@@ -116,7 +113,6 @@ function [mesh] = create_mesh(xp,yp,L,H,n_elements1,n_elements2)
     mesh.X = X;
     mesh.Y = Y;
     mesh.L = L;
-    mesh.H = H;
-    
+    mesh.H = H; 
 end
 

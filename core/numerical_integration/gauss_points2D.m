@@ -13,7 +13,7 @@ if (n_gauss == 3)
     weights = [1/3 1/3 1/3];
     order = 2;
 else
-   error(['No 2D Gauss integration rule with',num2str(n_gauss)',' points!!']); 
+   error(['No 2D Gauss integration rule with ',num2str(n_gauss)',' points!!']); 
 end
 
 

@@ -8,7 +8,8 @@ nlocalfunctions = fespace.n_functions_per_element;
 n_elements = size(connectivity,1);
 n_nodes = size(nodes,1);
 
-[gp,weights,n_gauss] = gauss_points2D(2);
+n_gauss = 3;
+[gp,weights,~] = gauss_points2D(n_gauss);
 
 b = zeros(n_nodes,1);
 

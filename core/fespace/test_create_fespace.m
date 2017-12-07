@@ -1,6 +1,6 @@
 % common variables
 
-tol = 1e-17;
+tol = 1e-12;
 
 mesh = create_mesh(0,0,1,1,1,1);
 

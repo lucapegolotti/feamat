@@ -8,7 +8,7 @@ if (length(find(bc_flags)) == 4)
     thereisneumann = 0;
 end
 
-A = assemble_stiffness(mu,fespace);
+A = assemble_stiffness(mu,fespace,1);
 b = assemble_rhs(fespace,fun);
 
 if (thereisneumann)

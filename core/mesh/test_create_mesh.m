@@ -1,6 +1,6 @@
 % common variables
 
-tol = 1e-17;
+tol = 1e-12;
 
 %% Test 1: all fields assigned correctly
 xp = 0;
@@ -15,6 +15,8 @@ assert(mesh.xp == 0);
 assert(mesh.yp == 0); 
 assert(mesh.L == L);
 assert(mesh.H == 1);
+assert(strcmp(mesh.type,'structured'));
+assert(mesh.h == 1/3)
 
 %% Test 2: verify vertex positions
 

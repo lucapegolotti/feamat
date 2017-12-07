@@ -1,17 +1,17 @@
-function [A] = assemble_stiffness(mu,fespace,varargin)
+function [A] = assemble_stiffness(mu,fespace)
 % Assemble stiffness matrix
 % input=
-%           mu: anonymous function of the diffusion coefficient
+%           mu: scalar or anonymous function of the diffusion coefficient.
+%           Note that if mu is a scalar the code is more efficient (for
+%           structured meshes)
 %           fespace: finite element space
-%           (optional)
-%           constant_mu: specify wether mu is constant (for optimization)
 % output=
 %           A: stiffness matrix (sparse)
 
 constant_mu = 0;
 
-if (nargin == 3)
-    constant_mu = varargin{1};
+if (~isa(mu,'function_handle'))
+    constant_mu = 1;
 end
 
 connectivity = fespace.connectivity;

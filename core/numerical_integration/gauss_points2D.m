@@ -1,11 +1,19 @@
-function [gp,weights,n_gauss] = gauss_points2D( order )
+function [gp,weights,order] = gauss_points2D(n_gauss)
+% Returs gauss quadrature points on a 2D triangle
+% input=
+%           n_gauss: number of gauss points
+%
+% output=
+%           gp: gauss points
+%           weights: weight of each point
+%           order: order of the quadrature rule
 
-if (order == 2)
+if (n_gauss == 3)
     gp = [1/6 1/6; 2/3 1/6; 1/6 2/3]';
     weights = [1/3 1/3 1/3];
-    n_gauss = 3;
+    order = 2;
 else
-   error(['Order ', num2str(order),' of gauss integration 2D not implemented!']); 
+   error(['No 2D Gauss integration rule with',num2str(n_gauss)',' points!!']); 
 end
 
 

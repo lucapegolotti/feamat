@@ -1,4 +1,16 @@
 function [A,b] = assembler_poisson(fespace,fun,mu,dirichlet_functions,neumann_functions)
+% Assemble poisson matrix with boundary conditions
+% input=
+%           fespace: finite elemnet space
+%           fun: anonymous function of the forcing term
+%           mu: anonymous function or scalar of the diffusion coefficient
+%               If scalar, the code is optimized on structured meshes
+%           dirichlet_functions: Dirichlet boundary data
+%           neumann_functions: Neumann_boundary data
+% output=
+%           A: system matrix
+%           b: right handside
+
 bc_flags = fespace.bc;
 
 thereisneumann = 1;

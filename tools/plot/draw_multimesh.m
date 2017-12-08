@@ -1,4 +1,8 @@
 function draw_multimesh(meshes)
+% Draw multiple meshes, which must be arranged in a structure
+% input=
+%           meshes: meshes to draw
+%
 
 xp = inf;
 yp = inf;

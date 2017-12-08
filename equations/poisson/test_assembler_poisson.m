@@ -84,6 +84,3 @@ c_orderh1 = log(h1errs(2:end)./h1errs(1:end-1))./log(h(2:end)./h(1:end-1));
 
 assert(abs(c_orderl2-3) < tol);
 assert(abs(c_orderh1-2) < tol);
-
-
-

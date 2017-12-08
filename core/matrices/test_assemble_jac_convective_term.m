@@ -14,7 +14,7 @@ assert(size(C1,1) == size(fespace_u.nodes,1));
 
 %% Test 2: check if optimized code is correct
 
-mesh = create_mesh(0,0,1,1,100,100);
+mesh = create_mesh(0,0,1,1,20,20);
 fespace_u = create_fespace(mesh,'P2',[0 0 0 0]);
 
 vector_field = rand(size(fespace_u.nodes,1)*2,1);

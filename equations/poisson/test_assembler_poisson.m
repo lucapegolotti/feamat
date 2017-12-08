@@ -6,7 +6,7 @@ tol = 1e-2;
 solex = @(x) sin(pi*x(1)).*sin(pi*x(2));
 gradex = @(x) [cos(pi*x(1)).*sin(pi*x(2));cos(pi*x(2)).*sin(pi*x(1))]*pi;
 
-f = @(x) 2*pi^2*sin(pi*x(1))*sin(pi*x(2));
+f = @(x) 2*pi^2*sin(pi*x(1,:)).*sin(pi*x(2,:));
 mu = @(x) 1;
 dirichlet_functions = @(x) [0;0;0;0];
 neumann_functions = @(x) [-pi*sin(pi*x(1)).*cos(pi*x(2));
@@ -30,8 +30,8 @@ for i = 4:5
     [A,b] = assembler_poisson(fespace,f,mu,dirichlet_functions,neumann_functions);
     sol = A\b;
 
-    l2error = compute_error(fespace,sol,solex,gradex,'L2');
-    h1error = compute_error(fespace,sol,solex,gradex,'H1');
+    l2error = compute_L2_error(fespace,sol,solex);
+    h1error = compute_H1_error(fespace,sol,solex,gradex);
 
     l2errs = [l2errs;l2error];
     h1errs = [h1errs;h1error];
@@ -48,7 +48,7 @@ assert(abs(c_orderh1-1) < tol);
 solex = @(x) sin(pi*x(1)).*sin(pi*x(2));
 gradex = @(x) [cos(pi*x(1)).*sin(pi*x(2));cos(pi*x(2)).*sin(pi*x(1))]*pi;
 
-f = @(x) 2*pi^2*sin(pi*x(1))*sin(pi*x(2));
+f = @(x) 2*pi^2*sin(pi*x(1,:)).*sin(pi*x(2,:));
 mu = @(x) 1;
 dirichlet_functions = @(x) [0;0;0;0];
 neumann_functions = @(x) [-pi*sin(pi*x(1)).*cos(pi*x(2));

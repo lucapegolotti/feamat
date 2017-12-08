@@ -1,5 +1,5 @@
 % common variables
-tol = 1e-12
+tol = 1e-12;
 
 %% Test 1: check rhs stays equal with homogeneous data
 

@@ -29,9 +29,9 @@ for i = 1:num_tests
         if (results(j).Incomplete == 1)
             incomplete = incomplete + 1;
         end
-
+        
     end
-
+    
     table(results)
 end
 
@@ -45,12 +45,11 @@ num_subdirs = size(sub_dirs,1);
 % call recursively this function on all the subdirectories
 % we start by 3 because 1 and 2 are reserved to the special dirs . and ..
 for i = 3:num_subdirs
-    if (i ~= 5)
-        [pa,fa,in] = find_and_run_tests([this_fdr,'/',sub_dirs(i).name]);
-        passed = passed + pa;
-        failed = failed + fa;
-        incomplete = incomplete + in;
-    end
+    [pa,fa,in] = find_and_run_tests([this_fdr,'/',sub_dirs(i).name]);
+    passed = passed + pa;
+    failed = failed + fa;
+    incomplete = incomplete + in;
+    
 end
 
 end

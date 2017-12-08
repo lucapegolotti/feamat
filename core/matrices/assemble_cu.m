@@ -1,17 +1,17 @@
-function [A] = assemble_stiffness(mu,fespace)
-% Assemble stiffness matrix
+function [M] = assemble_cu(c,fespace)
+% Assemble the discretization of the term c*u
 % input=
-%           mu: scalar or anonymous function of the diffusion coefficient.
-%           Note that if mu is a scalar the code is more efficient (for
+%           c: scalar or anonymous function of the  coefficient.
+%           Note that if c is a scalar the code is more efficient (for
 %           structured meshes)
 %           fespace: finite element space
 % output=
-%           A: stiffness matrix (sparse)
+%           M: matrix (sparse)
 
-constant_mu = 0;
+constant_c = 0;
 
-if (~isa(mu,'function_handle'))
-    constant_mu = 1;
+if (~isa(c,'function_handle'))
+    constant_c = 1;
 end
 
 connectivity = fespace.connectivity;
@@ -26,7 +26,7 @@ n_functionsqr = n_functions^2;
 % number of gauss points
 n_gauss = 3;
 
-elements_A = zeros(n_functions*n_elements,1);
+elements_M = zeros(n_functions*n_elements,1);
 indices_i = zeros(n_functions*n_elements,1);
 indices_j = zeros(n_functions*n_elements,1);
 
@@ -41,7 +41,7 @@ if (~strcmp(fespace.mesh.type,'structured'))
         x3 = vertices(indices(3),1:2)';
         
         [I1,I2] = meshgrid(indices,indices);
-
+        
         currindices = (i-1)*n_functionsqr+1:n_functionsqr*i;
         indices_i(currindices) = I1(:);
         indices_j(currindices) = I2(:);
@@ -49,22 +49,21 @@ if (~strcmp(fespace.mesh.type,'structured'))
         new_elements = zeros(size(I1,1)^2,1);
         
         mattransf = [x2-x1 x3-x1];
-        invmat = inv(mattransf);
         
         % transformation from parametric to physical
         transf = @(x) mattransf*x + x1;
         dettransf = abs(det(mattransf));
         
         for j = 1:n_gauss
-            transfgrad = invmat' * fespace.grads(gp(:,j));
-            stiffness_elements = mu(transf(gp(:,j)))*dettransf*(transfgrad'*transfgrad)*weights(j)/2;
-            new_elements = new_elements + stiffness_elements(:);
+            transffun = fespace.functions(gp(:,j))';
+            matrix_elements = c(transf(gp(:,j)))*dettransf*(transffun'*transffun)*weights(j)/2;
+            new_elements = new_elements + matrix_elements(:);
         end
-        elements_A(currindices) = new_elements;
+        elements_M(currindices) = new_elements;
     end
 else
     [fespace,gp] = add_members_structured_meshes(fespace, n_gauss);
-    if (~constant_mu)
+    if (~constant_c)
         for i = 1:n_elements
             indices = connectivity(i,1:end-1);
             x1 = vertices(indices(1),1:2)';
@@ -79,18 +78,18 @@ else
             % then the triangle is in this configuration /|
             if (indices(2) == indices(1) + 1)
                 for j = 1:n_gauss
-                    stiffness_elements = mu(fespace.transf1(gp(:,j),x1))* ...
-                        fespace.stiffness_elements1{j};
-                    new_elements = new_elements + stiffness_elements(:);
+                    matrix_elements = c(fespace.transf1(gp(:,j),x1))* ...
+                                      fespace.mass_elements1{j};
+                    new_elements = new_elements + matrix_elements(:);
                 end
             else
                 for j = 1:n_gauss
-                    stiffness_elements = mu(fespace.transf2(gp(:,j),x1))* ...
-                        fespace.stiffness_elements2{j};
-                    new_elements = new_elements + stiffness_elements(:);
+                    matrix_elements = c(fespace.transf2(gp(:,j),x1))* ...
+                                      fespace.mass_elements2{j};
+                    new_elements = new_elements + matrix_elements(:);
                 end
             end
-            elements_A(currindices) = new_elements;
+            elements_M(currindices) = new_elements;
         end
     else
         for i = 1:n_elements
@@ -103,17 +102,15 @@ else
             
             % then the triangle is in this configuration /|
             if (indices(2) == indices(1) + 1)
-                new_elements = fespace.stiffness_elements_sum1;
+                new_elements = fespace.mass_elements_sum1;
             else
-                new_elements = fespace.stiffness_elements_sum2;
+                new_elements = fespace.mass_elements_sum2;
             end
-            elements_A(currindices) = new_elements;
+            elements_M(currindices) = new_elements;
         end
-        elements_A = elements_A*mu;
     end
 end
 
-
-A = sparse(indices_i,indices_j,elements_A,n_nodes,n_nodes);
+M = sparse(indices_i,indices_j,elements_M,n_nodes,n_nodes);
 
 

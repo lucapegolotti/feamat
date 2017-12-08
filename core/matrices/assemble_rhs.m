@@ -1,4 +1,12 @@
 function [b] = assemble_rhs(fespace,fun)
+% Assemble right handside
+% input=
+%           fespace: finite element space
+%           fun: anonymous function or scalar (if fun == 0) of the right handside
+%           
+% output=
+%           b: right handside
+
 
 connectivity = fespace.connectivity;
 vertices = fespace.mesh.vertices;
@@ -7,6 +15,14 @@ nlocalfunctions = fespace.n_functions_per_element;
 
 n_elements = size(connectivity,1);
 n_nodes = size(nodes,1);
+
+if (~isa(fun,'function_handle'))
+    if (fun ~= 0)
+        error('Function must be a function handler or, if scalar, equal to zero!');
+    end
+    b = zeros(n_nodes,1);
+    return;
+end
 
 n_gauss = 3;
 [gp,weights,~] = gauss_points2D(n_gauss);

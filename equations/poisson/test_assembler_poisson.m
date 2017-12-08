@@ -72,8 +72,8 @@ for i = 4:5
     [A,b] = assembler_poisson(fespace,f,mu,dirichlet_functions,neumann_functions);
     sol = A\b;
 
-    l2error = compute_error(fespace,sol,solex,gradex,'L2');
-    h1error = compute_error(fespace,sol,solex,gradex,'H1');
+    l2error = compute_L2_error(fespace,sol,solex);
+    h1error = compute_H1_error(fespace,sol,solex,gradex);
 
     l2errs = [l2errs;l2error];
     h1errs = [h1errs;h1error];

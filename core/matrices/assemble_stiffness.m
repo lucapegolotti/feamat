@@ -113,7 +113,6 @@ else
     end
 end
 
-
 A = sparse(indices_i,indices_j,elements_A,n_nodes,n_nodes);
 
 

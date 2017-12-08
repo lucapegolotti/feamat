@@ -26,6 +26,3 @@ B2 = assemble_divergence(fespace_u,fespace_p,'dx');
 
 x = rand(size(fespace_u.nodes,1),1);
 assert(norm(B1*x - B2*x) < tol)
-
-
-

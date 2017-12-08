@@ -1,4 +1,14 @@
 function b = apply_dirichlet_bc_rhs(b,fespace,dirichlet_functions)
+% Apply Dirichlet boundary conditions to rhs by evaluating the Dirichlet
+% data in the Dirichlet nodes
+%
+% input=
+%           b: right handside
+%           fespace: finite element space
+%           dirichlet_functions: boundary data
+%                                
+% output=
+%           b: right handside with boundary conditions
 
 n_nodes = size(b,1);
 

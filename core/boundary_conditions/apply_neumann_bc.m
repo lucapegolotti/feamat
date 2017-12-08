@@ -1,5 +1,15 @@
-function b = apply_neumann_bc(fespace,b,neumann_functions,varargin)
-
+function b = apply_neumann_bc(b,fespace,neumann_functions,varargin)
+% Apply Neumann boundary conditions to matrix to rhs
+%
+% input=
+%           fespace: finite element space
+%           b: right handside
+%           neumann_functions: Neumann data
+%           (optional)
+%           order of quadrature rule (default = 3)
+%
+% output=
+%           b: modified right handside
 n_gauss1d = 2;
 if (nargin == 4)
     n_gauss1d = varargin{1};
@@ -7,7 +17,6 @@ end
 
 connectivity = fespace.connectivity;
 vertices = fespace.mesh.vertices;
-nodes = fespace.nodes;
 nlocalfunctions = fespace.n_functions_per_element;
 bc_flags = fespace.bc;
 
@@ -36,7 +45,7 @@ for i = 1:n_elements
             elseif (x1_edge(4) == x2_edge(4))
                 common_boundary = x1_edge(4);
             end
-
+            
             x1_edge = x1_edge(1:2);
             x2_edge = x2_edge(1:2);
             
@@ -53,10 +62,10 @@ for i = 1:n_elements
                     for k = 1:nlocalfunctions
                         b(indices(k)) = b(indices(k)) + dtransf*nf(common_boundary)*functions(k)*weights1d(j);
                     end
-                end  
+                end
             end
         end
-
+        
         if (vertices(indices(2),3) > 0 && vertices(indices(3),3) > 0)
             x1_edge = x2;
             x2_edge = x3;
@@ -70,10 +79,10 @@ for i = 1:n_elements
             elseif (x1_edge(4) == x2_edge(4))
                 common_boundary = x1_edge(4);
             end
-
+            
             x1_edge = x1_edge(1:2);
             x2_edge = x2_edge(1:2);
-
+            
             % only continue if common boundary and if neumann_conditions
             % must be applied (bc_flag == 0)
             if (common_boundary ~= 0 && bc_flags(common_boundary)==0)
@@ -87,10 +96,10 @@ for i = 1:n_elements
                     for k = 1:nlocalfunctions
                         b(indices(k)) = b(indices(k)) + dtransf*nf(common_boundary)*functions(k)*weights1d(j);
                     end
-                end  
+                end
             end
         end
-
+        
         if (vertices(indices(3),3) > 0 && vertices(indices(1),3) > 0)
             x1_edge = x3;
             x2_edge = x1;
@@ -104,7 +113,7 @@ for i = 1:n_elements
             elseif (x1_edge(4) == x2_edge(4))
                 common_boundary = x1_edge(4);
             end
-
+            
             x1_edge = x1_edge(1:2);
             x2_edge = x2_edge(1:2);
             
@@ -121,7 +130,7 @@ for i = 1:n_elements
                     for k = 1:nlocalfunctions
                         b(indices(k)) = b(indices(k)) + dtransf*nf(common_boundary)*functions(k)*weights1d(j);
                     end
-                end  
+                end
             end
         end
     end

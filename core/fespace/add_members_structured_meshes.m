@@ -1,4 +1,4 @@
-function [fespace,gp] = add_members_structured_meshes(fespace,n_gauss)
+function [fespace,gp,weights] = add_members_structured_meshes(fespace,n_gauss)
 % Add members to fespace which are necessary to optimize assembly on
 % structured meshes
 % input=

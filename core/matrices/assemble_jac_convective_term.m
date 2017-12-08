@@ -1,11 +1,11 @@
-function [C] = assemble_convective_term(fespace,u_old)
-% Assemble connective matrix u_{old} grad u
+function [J] = assemble_jac_convective_term(fespace,u_old,blocki,blockj)
+% Assemble jacobian of convective matrix u_{old} grad u
 % input=
 %           fespace: finite element space
 %           u_old: advecting velocity field
 %
 % output=
-%           C: convective matrix
+%           C: jacobian convective matrix
 
 connectivity = fespace.connectivity;
 vertices = fespace.mesh.vertices;
@@ -19,7 +19,7 @@ n_functionsqr = n_functions^2;
 % number of gauss points
 n_gauss = 3;
 
-elements_C = zeros(n_functions*n_elements,1);
+elements_J = zeros(n_functions*n_elements,1);
 indices_i = zeros(n_functions*n_elements,1);
 indices_j = zeros(n_functions*n_elements,1);
 
@@ -47,14 +47,15 @@ if (~strcmp(fespace.mesh.type,'structured'))
         for j = 1:n_gauss
             transfgrad = invmat' * fespace.grads(gp(:,j));
             transfun = fespace.functions(gp(:,j));
-            
-            u1 = transfun'*u_old(indices);
-            u2 = transfun'*u_old(indices + n_nodes);
-            
-            convective_elements = dettransf*transfgrad'*[u1;u2]*transfun'*weights(j)/2;
-            new_elements = new_elements + convective_elements(:);
+            du1 = transfgrad*u_old(indices);
+            du2 = transfgrad*u_old(indices+n_nodes);
+            du = [du1 du2]';
+            convective_element_jac = (du(blocki,blockj))*...
+                (transfun*transfun')*...
+                dettransf*weights(j)/2;
+            new_elements = new_elements + convective_element_jac(:);
         end
-        elements_C(currindices) = new_elements;
+        elements_J(currindices) = new_elements;
     end
 else
     [fespace,~,weights] = add_members_structured_meshes(fespace, n_gauss);
@@ -71,20 +72,28 @@ else
         % then the triangle is in this configuration /|
         if (indices(2) == indices(1) + 1)
             for j = 1:n_gauss
-                u1 = fespace.transffuns1{j}*u_old(indices);
-                u2 = fespace.transffuns1{j}*u_old(indices + n_nodes);
-                convective_elements = fespace.dettransf1*fespace.transfgrads1{j}'*[u1;u2]*fespace.transffuns1{j}*weights(j)/2;
-                new_elements = new_elements + convective_elements(:);
+                du1 = fespace.transfgrads1{j}*u_old(indices);
+                du2 = fespace.transfgrads1{j}*u_old(indices+n_nodes);
+                du = [du1 du2]';
+                convective_element_jac = fespace.dettransf1* ...
+                    du(blocki,blockj)* ...
+                    fespace.transffuns1{j}'* ...
+                    fespace.transffuns1{j} * weights(j)/2;
+                new_elements = new_elements + convective_element_jac(:);
             end
         else
             for j = 1:n_gauss
-                u1 = fespace.transffuns2{j}*u_old(indices);
-                u2 = fespace.transffuns2{j}*u_old(indices + n_nodes);
-                convective_elements = fespace.dettransf2*fespace.transfgrads2{j}'*[u1;u2]*fespace.transffuns2{j}*weights(j)/2;
-                new_elements = new_elements +convective_elements(:);
+                du1 = fespace.transfgrads2{j}*u_old(indices);
+                du2 = fespace.transfgrads2{j}*u_old(indices+n_nodes);
+                du = [du1 du2]';
+                convective_element_jac = fespace.dettransf2* ...
+                    du(blocki,blockj)* ...
+                    fespace.transffuns2{j}'* ...
+                    fespace.transffuns2{j} * weights(j)/2;
+                new_elements = new_elements + convective_element_jac(:);
             end
         end
-        elements_C(currindices) = new_elements;
+        elements_J(currindices) = new_elements;
     end
 end
-C = sparse(indices_i,indices_j,elements_C,n_nodes,n_nodes);
+J = sparse(indices_i,indices_j,elements_J,n_nodes,n_nodes);

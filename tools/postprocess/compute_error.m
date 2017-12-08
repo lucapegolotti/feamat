@@ -5,7 +5,8 @@ vertices = fespace.mesh.vertices;
 
 n_elements = size(connectivity,1);
 
-[gp,weights,n_gauss] = gauss_points2D(2);
+n_gauss = 3;
+[gp,weights,~] = gauss_points2D(n_gauss);
 
 nlocalfunctions = fespace.n_functions_per_element;
 

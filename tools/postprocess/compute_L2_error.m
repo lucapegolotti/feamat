@@ -1,8 +1,11 @@
 function err = compute_L2_error(fespace,values,fexact)
 % Compute L2 error with respect to exact solution
+% input=
 %           fespace: finite element space
 %           values: vector of degrees of freedom
 %           fexact: exact solution
+% output=
+%           err: L2 error
 %
 
 connectivity = fespace.connectivity;
@@ -13,13 +16,11 @@ n_elements = size(connectivity,1);
 n_gauss = 3;
 [gp,weights,~] = gauss_points2D(n_gauss);
 
-nlocalfunctions = fespace.n_functions_per_element;
-
 err = 0;
 
 if (~strcmp(fespace.mesh.type,'structured'))
     for i = 1:n_elements
-        indices = connectivity(i,:);
+        indices = connectivity(i,1:end-1);
         x1 = vertices(indices(1),1:2)';
         x2 = vertices(indices(2),1:2)';
         x3 = vertices(indices(3),1:2)';
@@ -32,10 +33,7 @@ if (~strcmp(fespace.mesh.type,'structured'))
         
         for j = 1:n_gauss
             functions = fespace.functions(gp(:,j));
-            value_in_gp = 0;
-            for k = 1:nlocalfunctions
-                value_in_gp = value_in_gp + values(indices(k))*functions(k);
-            end
+            value_in_gp = functions'*values(indices);
             err = err + dettransf*(value_in_gp-fexact(transf(gp(:,j))))^2*weights(j)/2;
         end
     end

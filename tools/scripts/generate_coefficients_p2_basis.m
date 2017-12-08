@@ -1,6 +1,9 @@
 clear all
 clc
 
+% compute coefficients of basis functions for P2 polynomials
+
+
 row = @(x) [x(1)^2 x(2)^2 x(1)*x(2) x(1) x(2) 1];
 
 p1 = [0 0];

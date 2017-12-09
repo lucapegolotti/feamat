@@ -7,14 +7,12 @@ bottom_left_corner_y = 0;
 L = 1;
 H = 1;
 
-n_elements_x = 30;
-n_elements_y = 30;
+n_elements_x = 100;
+n_elements_y = 100;
 
 mesh = create_mesh(bottom_left_corner_x, ...
                    bottom_left_corner_y, ...
                    L,H,n_elements_x,n_elements_y);
-
-mesh.type = '';
 
 bc_flags = [1 1 1 1];
 
@@ -31,4 +29,5 @@ neumann_functions = @(x) [0 0;0 0;0 0;0 0]';
 
 sol = A\b;
 
-%plot_solution_vp(fespace_u,fespace_p,sol,'U');
+plot_solution_vp(fespace_u,fespace_p,sol,'U');
+export_vtk_fluid(sol,fespace_u,fespace_p,'example_steady_stokes.vtk')

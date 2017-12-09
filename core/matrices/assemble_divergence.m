@@ -58,7 +58,8 @@ if (~strcmp(fespace_u.mesh.type,'structured'))
             transfgrad = invmat'*fespace_u.grads(gp(:,j));
             transfun = fespace_p.functions(gp(:,j));
 
-            divergence_element = dettransf*(transfgrad(index_der,:)')*transfun(:)'*weights(j)/2;
+            divergence_element = dettransf*transfun(:)* ...
+                                 (transfgrad(index_der,:))*weights(j)/2;
             new_elements = new_elements + divergence_element(:);
         end
         elements_B(currindices) = new_elements;
@@ -71,11 +72,12 @@ else
     divergence_elements2 = {};
     for j = 1:n_gauss
         divergence_elements1{end+1} = fespace_u.dettransf1* ...
-            (fespace_u.transfgrads1{j}(index_der,:)')*...
-            fespace_p.transffuns1{j}(:)'*weights(j)/2;
+            fespace_p.transffuns1{j}(:)* ...
+            (fespace_u.transfgrads1{j}(index_der,:))*weights(j)/2;
+
         divergence_elements2{end+1} = fespace_u.dettransf2* ...
-            (fespace_u.transfgrads2{j}(index_der,:)')*...
-            fespace_p.transffuns2{j}(:)'*weights(j)/2;
+            fespace_p.transffuns2{j}(:)* ...
+            (fespace_u.transfgrads2{j}(index_der,:))*weights(j)/2;
     end
     sum_divergence_elements1 = divergence_elements1{1};
     sum_divergence_elements2 = divergence_elements2{1};

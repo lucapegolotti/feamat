@@ -34,33 +34,64 @@ indices_j = zeros(n_functions*n_elements,1);
 if (~strcmp(fespace.mesh.type,'structured'))
     
     [gp,weights,~] = gauss_points2D(n_gauss);
-    for i = 1:n_elements
-        indices = connectivity(i,1:end-1);
-        x1 = vertices(indices(1),1:2)';
-        x2 = vertices(indices(2),1:2)';
-        x3 = vertices(indices(3),1:2)';
-        
-        [I1,I2] = meshgrid(indices,indices);
-
-        currindices = (i-1)*n_functionsqr+1:n_functionsqr*i;
-        indices_i(currindices) = I1(:);
-        indices_j(currindices) = I2(:);
-        
-        new_elements = zeros(size(I1,1)^2,1);
-        
-        mattransf = [x2-x1 x3-x1];
-        invmat = inv(mattransf);
-        
-        % transformation from parametric to physical
-        transf = @(x) mattransf*x + x1;
-        dettransf = abs(det(mattransf));
-        
-        for j = 1:n_gauss
-            transfgrad = invmat' * fespace.grads(gp(:,j));
-            stiffness_elements = mu(transf(gp(:,j)))*dettransf*(transfgrad'*transfgrad)*weights(j)/2;
-            new_elements = new_elements + stiffness_elements(:);
+    if (~constant_mu)
+        for i = 1:n_elements
+            indices = connectivity(i,1:end-1);
+            x1 = vertices(indices(1),1:2)';
+            x2 = vertices(indices(2),1:2)';
+            x3 = vertices(indices(3),1:2)';
+            
+            [I1,I2] = meshgrid(indices,indices);
+            
+            currindices = (i-1)*n_functionsqr+1:n_functionsqr*i;
+            indices_i(currindices) = I1(:);
+            indices_j(currindices) = I2(:);
+            
+            new_elements = zeros(size(I1,1)^2,1);
+            
+            mattransf = [x2-x1 x3-x1];
+            invmat = inv(mattransf);
+            
+            % transformation from parametric to physical
+            transf = @(x) mattransf*x + x1;
+            dettransf = abs(det(mattransf));
+            
+            for j = 1:n_gauss
+                transfgrad = invmat' * fespace.grads(gp(:,j));
+                stiffness_elements = mu(transf(gp(:,j)))*dettransf*(transfgrad'*transfgrad)*weights(j)/2;
+                new_elements = new_elements + stiffness_elements(:);
+            end
+            elements_A(currindices) = new_elements;
         end
-        elements_A(currindices) = new_elements;
+    else
+        for i = 1:n_elements
+            indices = connectivity(i,1:end-1);
+            x1 = vertices(indices(1),1:2)';
+            x2 = vertices(indices(2),1:2)';
+            x3 = vertices(indices(3),1:2)';
+            
+            [I1,I2] = meshgrid(indices,indices);
+            
+            currindices = (i-1)*n_functionsqr+1:n_functionsqr*i;
+            indices_i(currindices) = I1(:);
+            indices_j(currindices) = I2(:);
+            
+            new_elements = zeros(size(I1,1)^2,1);
+            
+            mattransf = [x2-x1 x3-x1];
+            invmat = inv(mattransf);
+            
+            % transformation from parametric to physical
+            transf = @(x) mattransf*x + x1;
+            dettransf = abs(det(mattransf));
+            
+            for j = 1:n_gauss
+                transfgrad = invmat' * fespace.grads(gp(:,j));
+                stiffness_elements = mu*dettransf*(transfgrad'*transfgrad)*weights(j)/2;
+                new_elements = new_elements + stiffness_elements(:);
+            end
+            elements_A(currindices) = new_elements;
+        end
     end
 else
     [fespace,gp] = add_members_structured_meshes(fespace, n_gauss);

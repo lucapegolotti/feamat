@@ -14,6 +14,8 @@ mesh = create_mesh(bottom_left_corner_x, ...
                    bottom_left_corner_y, ...
                    L,H,n_elements_x,n_elements_y);
 
+mesh.type = '';
+
 bc_flags = [1 0 0 1];
 fespace = create_fespace(mesh,'P2',bc_flags);
 

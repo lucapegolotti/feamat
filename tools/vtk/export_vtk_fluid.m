@@ -21,9 +21,9 @@ if (strcmp(fespace_u.mesh.type,'structured'))
     u2 = reshape(u2(1:size(fespace_u.mesh.vertices,1)),size(X,1),size(X,2));
     u3 = 0*u1;
     p = reshape(p(1:size(fespace_p.mesh.vertices,1)),size(X,1),size(X,2));
-
-    vtkwrite(filename,'structured_grid',X,Y,Z,'vectors','velocity', ...
-             u1,u2,u3,'scalars','pressure',p,'binary');
+    
+    vtkwrite(filename,'structured_grid',X,Y,Z,'scalars','pressure',p, ...
+        'vectors','velocity', u1,u2,u3,'binary');
 else
     error('Mesh type not supported!');
 end

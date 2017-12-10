@@ -1,4 +1,4 @@
-function [sol]= solve_fluid_system(A,b,fespace_u,fespace_p)
+function [sol,err,it]= solve_fluid_system(A,b,fespace_u,fespace_p,varargin)
 % Solve a system  of type A sol = b (with A linear matrix) and assemble
 % fluid solution with data members
 %
@@ -7,16 +7,30 @@ function [sol]= solve_fluid_system(A,b,fespace_u,fespace_p)
 %           b: right handside
 %           fespace_u: finite element space of the velocity
 %           fespace_p: finite element space of the pressure
+%           (required if A is function)
+%           'method' structure containing method's parameters
 %
 % output= 
 %           sol: data structure with fluid members
+%           err: error (for non-linear systems)
+%           it: number of iterations (for iterative solver)
 %
 
 % this is the case when A is a constant matrix
 if (~isa(A,'function_handle'))
     vecsol = A\b;
+    err = 0;
+    it  = 0;
 else
-    error('The non-linear solver is not yet implemented!');
+    if (nargin < 5)
+        error('The method to use should be specified as optional parameter!');
+    end
+    method = varargin{1};
+    if (strcmp(method.name,'newton'))
+        [vecsol,err,it] = solve_with_newtons_method(method.f,method.x0,method.jac,method.tol,method.maxit);
+    else
+        error('The non-linear solver is not yet implemented!');
+    end
 end
 
 n_nodes_u = size(fespace_u.nodes,1);

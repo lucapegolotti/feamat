@@ -1,6 +1,6 @@
 clear all
 clc
-pwd
+
 bottom_left_corner_x = 0;
 bottom_left_corner_y = 0;
 
@@ -19,7 +19,7 @@ bc_flags = [1 1 1 1];
 fespace_u = create_fespace(mesh,'P2',bc_flags);
 fespace_p = create_fespace(mesh,'P1',bc_flags);
 
-f = @(x) [0*x(1,:);0*x(2,:)];
+f = [0;0];
 mu = 1;
 
 dirichlet_functions = @(x) [0 0;0 0;1 0;0 0]';
@@ -30,5 +30,5 @@ neumann_functions = @(x) [0 0;0 0;0 0;0 0]';
 sol = solve_fluid_system(A,b,fespace_u,fespace_p);
 
 % we plot the result using matlab and by exporting it to vtk
-plot_fe_fluid_function(sol,'P');
+plot_fe_fluid_function(sol,'U');
 export_vtk_fluid(sol,'example_steady_stokes.vtk')

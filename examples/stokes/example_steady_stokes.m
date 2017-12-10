@@ -1,6 +1,6 @@
 clear all
 clc
-
+pwd
 bottom_left_corner_x = 0;
 bottom_left_corner_y = 0;
 
@@ -27,7 +27,8 @@ neumann_functions = @(x) [0 0;0 0;0 0;0 0]';
 
 [A,b] = assembler_steady_stokes(fespace_u,fespace_p,f,mu,dirichlet_functions,neumann_functions);
 
-sol = A\b;
+sol = solve_fluid_system(A,b,fespace_u,fespace_p);
 
-plot_solution_vp(fespace_u,fespace_p,sol,'U');
-export_vtk_fluid(sol,fespace_u,fespace_p,'example_steady_stokes.vtk')
+% we plot the result using matlab and by exporting it to vtk
+plot_fe_fluid_function(sol,'P');
+export_vtk_fluid(sol,'example_steady_stokes.vtk')

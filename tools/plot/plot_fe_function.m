@@ -1,10 +1,10 @@
-function [h]= plot_solution_on_fespace(fespace,vec,varargin)
+function [h]= plot_fe_function(vec,fespace,varargin)
 % Plot finite element function as a surface (note: only value at vertices 
 % of triangles are used for the visualization)
 %
 % input=
-%           fespace: finite element space
 %           vec: vector of degrees of freedom
+%           fespace: finite element space
 %           (optional)
 %           'contour' or 'contourf' to change visualization mode
 %

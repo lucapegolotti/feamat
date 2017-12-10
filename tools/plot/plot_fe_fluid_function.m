@@ -1,4 +1,14 @@
-function plot_solution_vp(fespace_u,fespace_p,sol, what,varargin)
+function plot_fe_fluid_function(sol,what,varargin)
+% Plot finite element fluid function
+%
+% input=
+%           sol: fluid datastructured (created with solve_fluid_system)
+%           what: 'U' or 'P', it specifies which field to plot (either
+%           velocity or pressure)
+%           (optional)
+%           a 2 component vector that specifies the minimum and maximum
+%           value to plot
+%
 
 if (nargin >= 5)
     arg = varargin{1};
@@ -7,20 +17,18 @@ if (nargin >= 5)
 end
 
 if (what == 'U')
-    n_nodes_u = size(fespace_u.nodes,1);
 
-    u1 = sol(1:n_nodes_u);
-    u2 = sol(n_nodes_u+1:2*n_nodes_u);
+    fespace_u = sol.fespace_u;
 
     n_vertices = size(fespace_u.mesh.vertices,1);
     n1 = size(fespace_u.mesh.X,1);
     n2 = size(fespace_u.mesh.X,2);
-    U1 = reshape(u1(1:n_vertices),n1,n2);
-    U2 = reshape(u2(1:n_vertices),n1,n2);
+    U1 = reshape(sol.u1(1:n_vertices),n1,n2);
+    U2 = reshape(sol.u2(1:n_vertices),n1,n2);
 
     N = sqrt(U1.^2+U2.^2);
 
-    [~,c] = contourf(fespace_u.mesh.X,fespace_p.mesh.Y,N);
+    [~,c] = contourf(fespace_u.mesh.X,fespace_u.mesh.Y,N);
     c.LineStyle = 'none';
     shading interp
     h = colorbar;
@@ -45,15 +53,14 @@ if (what == 'U')
     q.AutoScaleFactor = 0.5;
     hold off
 elseif (what == 'P')
-    n_nodes_u = size(fespace_u.nodes,1);
+    fespace_p = sol.fespace_p;
 
-    p = sol(n_nodes_u*2+1:end);
+    p = sol.p;
 
-    n1 = size(fespace_u.mesh.X,1);
-    n2 = size(fespace_u.mesh.X,2);
+    n1 = size(fespace_p.mesh.X,1);
+    n2 = size(fespace_p.mesh.X,2);
 
-
-    [~,c] = contourf(fespace_u.mesh.X,fespace_u.mesh.Y,reshape(p,n1,n2));
+    [~,c] = contourf(fespace_p.mesh.X,fespace_p.mesh.Y,reshape(p,n1,n2));
     c.LineStyle = 'none';
     
     h = colorbar;  

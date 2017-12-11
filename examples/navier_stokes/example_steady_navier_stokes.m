@@ -7,8 +7,8 @@ bottom_left_corner_y = 0;
 L = 1;
 H = 1;
 
-n_elements_x = 40;
-n_elements_y = 40;
+n_elements_x = 70;
+n_elements_y = 70;
 
 mesh = create_mesh(bottom_left_corner_x, ...
     bottom_left_corner_y, ...
@@ -22,7 +22,7 @@ fespace_p = create_fespace(mesh,'P1',bc_flags);
 f = [0;0];
 mu = 1;
 
-U = 200;
+U = 500;
 
 dirichlet_functions = @(x) [0 0;0 0;U 0;0 0]';
 neumann_functions = @(x) [0 0;0 0;0 0;0 0]';
@@ -46,4 +46,4 @@ method.maxit = 100;
 
 % plot and export
 plot_fe_fluid_function(sol,'U');
-%export_vtk_fluid(sol,'example_steady_navier_stokes.vtk');
+export_vtk_fluid(sol,'example_steady_navier_stokes.vtk');

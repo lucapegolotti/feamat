@@ -159,6 +159,22 @@ switch upper(dataType)
         % Parse remaining argument.
         vidx = find(strcmpi(varargin,'VECTORS'));
         sidx = find(strcmpi(varargin,'SCALARS'));
+        
+        if sidx~=0
+            for ii = 1:length(sidx)
+                title = varargin{sidx(ii)+1};
+                fprintf(fid, ['\nSCALARS ', title,' float\n']);
+                fprintf(fid, 'LOOKUP_TABLE default\n');
+                if ~binaryflag
+                    spec = ['%0.', precision, 'f '];
+                    fprintf(fid, spec, varargin{ sidx(ii) + 2});
+                else
+                    fwrite(fid, varargin{ sidx(ii) + 2}, 'float', 'b');
+                end
+%                 fwrite(fid, reshape(varargin{sidx(ii)+2},1,n_elements),'float','b');
+            end
+        end
+        
         if vidx~=0
             for ii = 1:length(vidx)
                 title = varargin{vidx(ii)+1};
@@ -178,20 +194,6 @@ switch upper(dataType)
 %                 fwrite(fid, [reshape(varargin{vidx(ii)+2},1,n_elements);...
 %                 reshape(varargin{vidx(ii)+3},1,n_elements);...
 %                 reshape(varargin{vidx(ii)+4},1,n_elements)],'float','b');
-            end
-        end
-        if sidx~=0
-            for ii = 1:length(sidx)
-                title = varargin{sidx(ii)+1};
-                fprintf(fid, ['\nSCALARS ', title,' float\n']);
-                fprintf(fid, 'LOOKUP_TABLE default\n');
-                if ~binaryflag
-                    spec = ['%0.', precision, 'f '];
-                    fprintf(fid, spec, varargin{ sidx(ii) + 2});
-                else
-                    fwrite(fid, varargin{ sidx(ii) + 2}, 'float', 'b');
-                end
-%                 fwrite(fid, reshape(varargin{sidx(ii)+2},1,n_elements),'float','b');
             end
         end
         

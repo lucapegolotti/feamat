@@ -21,7 +21,7 @@ while (err > tol && it < maxit)
     it = it + 1;
     disp(['Newton iteration ',num2str(it),' ...']);
     J = jac(x);
-
+    
     x = x - J\res;
     res = f(x);
     err = norm(res);

@@ -2,8 +2,8 @@ function b = apply_neumann_bc(b,fespace,neumann_functions,varargin)
 % Apply Neumann boundary conditions to matrix to rhs
 %
 % input=
-%           fespace: finite element space
 %           b: right handside
+%           fespace: finite element space
 %           neumann_functions: Neumann data
 %           (optional)
 %           order of gauss points (default = 2)

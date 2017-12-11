@@ -51,7 +51,7 @@ if (what == 'U')
     q.Color = 'black';
     q.LineWidth = 1;
     q.AutoScaleFactor = 0.5;
-    hold off
+    
 elseif (what == 'P')
     fespace_p = sol.fespace_p;
 

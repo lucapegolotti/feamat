@@ -6,7 +6,7 @@ function b = apply_neumann_bc(b,fespace,neumann_functions,varargin)
 %           b: right handside
 %           neumann_functions: Neumann data
 %           (optional)
-%           order of quadrature rule (default = 3)
+%           order of gauss points (default = 2)
 %
 % output=
 %           b: modified right handside

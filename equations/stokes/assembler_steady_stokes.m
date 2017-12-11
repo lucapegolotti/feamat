@@ -67,7 +67,7 @@ if (thereisneumann)
     b1 = apply_neumann_bc(b1,fespace_u,neu1);
     b2 = apply_neumann_bc(b2,fespace_u,neu2);
 else
-    % arbitrary fix pressure in first dof if there is no Neumann condition
+    % arbitrarly fix pressure in first dof if there is no Neumann condition
     H3(1,:) = 0;
     H3(1,2*n_nodes_u+1) = 1;
 end

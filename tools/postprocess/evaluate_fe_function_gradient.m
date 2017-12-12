@@ -1,7 +1,18 @@
-function [I,code] = interpolate_in_point(fespace,sol,x,y)
+function [I,code] = evaluate_fe_function_gradient(f_dofs,fespace,x_p)
+% Evaluate gradient of finite element function in point
 % ATTENTION! this functions assumes that the underlying mesh is structured
 % the function returns code=1 if the point is outside the mesh
+% input=
+%           f_dofs: values at degrees of freedom of the function          
+%           fespace: finite element space
+%           x_p: point of interest
+% output=
+%           I: value of the gradient of the function
+%           code: 0 if ok, 1 if the point is outside the domain
 mesh = fespace.mesh;
+
+x = x_p(1);
+y = x_p(2);
 
 if (x < mesh.xp || x > mesh.xp+mesh.L)
     I = 0;
@@ -22,8 +33,6 @@ L = length(xx);
 
 indx = max(find(xx <= x));
 indy = max(find(yy <= y));
-
-
 
 elindex = 2*L*(indy-1) + indx;
 
@@ -49,10 +58,9 @@ mattransf = [x2-x1 x3-x1];
 
 transf = @(xq) mattransf\(xq-x1);    
 
-transfun = fespace.functions(transf([x;y]))';
+transfgrad = fespace.grads(transf([x;y]));
 
-I = transfun*sol(indv(1:end-1));
+I = transfgrad*f_dofs(indv(1:end-1));
 code = 0;
 
-end
 

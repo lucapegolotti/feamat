@@ -10,7 +10,7 @@ function plot_fe_fluid_function(sol,what,varargin)
 %           value to plot
 %
 
-if (nargin >= 5)
+if (nargin >= 3)
     arg = varargin{1};
     mlim = arg(1);
     Mlim = arg(2);
@@ -32,7 +32,7 @@ if (what == 'U')
     c.LineStyle = 'none';
     shading interp
     h = colorbar;
-    if (nargin >= 5)
+    if (nargin >= 3)
         if (mlim == 0 && Mlim == 0)
             mlim = 0; 
             Mlim = 1;

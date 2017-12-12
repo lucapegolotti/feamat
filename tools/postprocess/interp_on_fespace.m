@@ -7,7 +7,7 @@ interpsol = zeros(size(nodes,1),1);
 for i = 1:length(nodes)
     node = nodes(i,1:2);
     
-    [I1,code1] = interpolate_in_point(fespace1,sol1,node(1),node(2));
+    [I1,code1] = evaluate_fe_function(sol1,fespace1,node);
     
     if (code1 == 0)
         interpsol(i) = I1;

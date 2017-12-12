@@ -9,12 +9,12 @@ u = zeros(samplepoints,1);
 if (strcmp(label,'Xpar'))
     x = linspace(xmin,xmax,samplepoints);
     for j = 1:samplepoints
-        u(j) = interpolate_in_point(fespace,sol,x(j),coordinate);
+        u(j) = evaluate_fe_function(sol,fespace,[x(j);coordinate]);
     end
 elseif (strcmp(label,'Ypar'))
     x = linspace(ymin,ymax,samplepoints);
     for j = 1:samplepoints
-        u(j) = interpolate_in_point(fespace,sol,coordinate,x(j));
+        u(j) = evaluate_fe_function(sol,fespace,[coordinate;x(j)]);
     end
 end
 

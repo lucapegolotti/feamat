@@ -4,15 +4,15 @@ tol = 1e-2;
 %% Test 1: verify order convergence against exact solution P2P1
 
 u1ex = @(x) sin(x(2,:)*pi);
-u2ex = @(x) exp(x(1,:))-x(1,:)*exp(1);
-pex = @(x) -0.5*x(1,:)^2+0.5;
+u2ex = @(x) exp(x(1,:));
+pex = @(x) -0.5*x(1,:)^2;
 
 u1exdx = @(x) 0;
 u1exdy = @(x) pi*cos(x(2,:)*pi);
 u1exdxdx = @(x) 0;
 u1exdydy = @(x) -pi^2*sin(x(2,:)*pi);
 
-u2exdx = @(x) exp(x(1,:))-exp(1);
+u2exdx = @(x) exp(x(1,:));
 u2exdy = @(x) 0;
 u2exdxdx = @(x) exp(x(1,:));
 u2exdydy = @(x) 0;

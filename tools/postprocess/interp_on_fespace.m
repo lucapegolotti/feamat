@@ -12,6 +12,7 @@ for i = 1:length(nodes)
     if (code1 == 0)
         interpsol(i) = I1;
     else
-        error(['Point (',num2str(node(1)),',',num2str(node(2)),') is outside the domain']);
+        interpsol(i) = 0;
+        %error(['Point (',num2str(node(1)),',',num2str(node(2)),') is outside the domain']);
     end
 end

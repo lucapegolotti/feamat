@@ -56,12 +56,9 @@ zero_mat_u = sparse(n_nodes_u,n_nodes_u);
 zero_mat_p = sparse(n_nodes_p,n_nodes_p);
 zero_mat_up = sparse(n_nodes_u,n_nodes_p);
 
-H1 = [A zero_mat_u -B1'];
+H1 = [A zero_mat_u' -B1'];
 H2 = [zero_mat_u A -B2'];
 H3 = [-B1 -B2 zero_mat_p];
-
-[H1,b1] = apply_dirichlet_bc(H1,b1,fespace_u,dir1);
-[H2(:,n_nodes_u+1:end),b2] = apply_dirichlet_bc(H2(:,n_nodes_u+1:end),b2,fespace_u,dir2);
 
 if (thereisneumann)
     b1 = apply_neumann_bc(b1,fespace_u,neu1);
@@ -72,6 +69,8 @@ else
     H3(1,2*n_nodes_u+1) = 1;
 end
 
+[H1,b1] = apply_dirichlet_bc(H1,b1,fespace_u,dir1);
+[H2(:,n_nodes_u+1:end),b2] = apply_dirichlet_bc(H2(:,n_nodes_u+1:end),b2,fespace_u,dir2);
+
 H = [H1;H2;H3];
 b = [b1;b2;zeros(n_nodes_p,1)];
-

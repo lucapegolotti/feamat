@@ -80,5 +80,3 @@ else
     end
 end
 err = sqrt(err);
-
-

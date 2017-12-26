@@ -55,12 +55,13 @@ if (m1 < m2)
 end
 
 mattransf = [x2-x1 x3-x1];
+invmat = inv(mattransf);
 
 transf = @(xq) mattransf\(xq-x1);    
 
 transfgrad = fespace.grads(transf([x;y]));
 
-I = transfgrad*f_dofs(indv(1:end-1));
+I = invmat'*transfgrad*f_dofs(indv(1:end-1));
 code = 0;
 
 

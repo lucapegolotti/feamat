@@ -17,7 +17,7 @@ function [fespace,gp,weights] = add_members_structured_meshes(fespace,n_gauss)
 %   /  |
 %   ----
 
-fespace.mattransf1 = [1 1; 0 1] * fespace.mesh.h;
+fespace.mattransf1 = [fespace.mesh.h1 fespace.mesh.h1; 0 fespace.mesh.h2];
 fespace.dettransf1 = abs(det(fespace.mattransf1));
 fespace.transf1 = @(x,x1) fespace.mattransf1 * x + x1;
 fespace.transfgrads1 = {};
@@ -61,7 +61,7 @@ end
 %   | /
 %   |/
 
-fespace.mattransf2 = [0 1; 1 1] * fespace.mesh.h;
+fespace.mattransf2 = [0 fespace.mesh.h1; fespace.mesh.h2 fespace.mesh.h2];
 fespace.dettransf2 = abs(det(fespace.mattransf2));
 fespace.transf2 = @(x,x1) fespace.mattransf2 * x + x1;
 fespace.transfgrads2 = {};

@@ -13,7 +13,7 @@ assert(size(A1,1) == size(fespace.nodes,1))
 
 %% Test 2: check if optimized code is correct
 
-mesh = create_mesh(0,0,1,1,20,20);
+mesh = create_mesh(0,0,1,1,20,25);
 fespace = create_fespace(mesh,'P2',[0 0 0 0]);
 
 A1 = assemble_stiffness(1, fespace);

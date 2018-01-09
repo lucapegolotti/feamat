@@ -125,8 +125,10 @@ mesh.X = X;
 mesh.Y = Y;
 mesh.L = L;
 mesh.H = H;
-% mesh.type = 'structured';
-mesh.type = '';
-mesh.h = min(x(2)-x(1),y(2)-y(1));
+mesh.type = 'structured';
+%mesh.type = '';
+mesh.h1 = x(2)-x(1);
+mesh.h2 = y(2)-y(1);
+mesh.h = min(mesh.h1,mesh.h2);
 end
 

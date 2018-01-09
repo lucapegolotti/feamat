@@ -125,7 +125,8 @@ mesh.X = X;
 mesh.Y = Y;
 mesh.L = L;
 mesh.H = H;
-mesh.type = 'structured';
+% mesh.type = 'structured';
+mesh.type = '';
 mesh.h = min(x(2)-x(1),y(2)-y(1));
 end
 

@@ -24,3 +24,5 @@ J(indices_u1,indices_u1) = J(indices_u1,indices_u1) + J11;
 J(indices_u1,indices_u2) = J(indices_u1,indices_u2) + J12;
 J(indices_u2,indices_u1) = J(indices_u2,indices_u1) + J21;
 J(indices_u2,indices_u2) = J(indices_u2,indices_u2) + J22;
+
+J = sparse(J);

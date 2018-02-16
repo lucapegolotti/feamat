@@ -1,8 +1,7 @@
 function export_vtk_fluid(sol,filename,varargin)
 % Export velocity-pressure in vtk format by using vtkwrite
 % input=
-%           sol: vector of degrees of freedom of the solution
-%           fespace: finite element space
+%           sol: structure of the solution 
 %           filename: output filename
 %           (optional)
 %           'U' or 'P', to export only velocity or pressure

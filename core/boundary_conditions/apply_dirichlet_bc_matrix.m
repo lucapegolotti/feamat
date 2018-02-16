@@ -18,22 +18,6 @@ nodes = fespace.nodes;
 bc_flags = fespace.bc;
 
 indices_to_diagonalize = [];
-% for i = 1:n_nodes
-%     if (nodes(i,3)~=0)
-%         if (bc_flags(nodes(i,3)))
-%             A(i,:) = 0;
-%             if (i <= dim2)
-%                 A(i,i) = diagvalue;
-%             end
-%         elseif (nodes(i,4) ~= 0 && bc_flags(nodes(i,4)))
-%             A(i,:) = 0;
-%             if (i <= dim2)
-%                 A(i,i) = diagvalue;
-%             end
-%         end
-%     end
-% end
-indices_to_diagonalize = [];
 for i = 1:n_nodes
     if (nodes(i,3)~=0 && bc_flags(nodes(i,3)) || ...
         nodes(i,4) ~= 0 && bc_flags(nodes(i,4)))

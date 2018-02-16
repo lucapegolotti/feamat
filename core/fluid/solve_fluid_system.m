@@ -28,6 +28,18 @@ else
     method = varargin{1};
     if (strcmp(method.name,'newton'))
         [vecsol,err,it] = solve_with_newtons_method(method.f,method.x0,method.jac,method.tol,method.maxit);
+    elseif (strcmp(method.name,'fixed_point'))
+        [vecsol,err,it] = solve_with_fixed_point(method.f,method.x0,method.tol,method.maxit);
+    elseif (strcmp(method.name,'newton_and_fixed_point'))
+        [vecsol,err,it] = solve_with_newtons_method(method.f,method.x0,method.jac,method.tol,method.maxit);
+        if (err > tol)
+            oldvecsol = vecsol;
+            [vecsol,err,it] = solve_with_newtons_method(method.f,vecsol,method.jac,method.tol,method.maxit);
+            if (it > method.maxit)
+                vecsol = oldvecsol;
+                warning('Neither Newton method nor fixed point converged with the desired tolerance');
+            end
+        end
     else
         error('The non-linear solver is not yet implemented!');
     end

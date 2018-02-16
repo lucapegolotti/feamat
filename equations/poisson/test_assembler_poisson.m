@@ -8,7 +8,7 @@ gradex = @(x) [cos(pi*x(1)).*sin(pi*x(2));cos(pi*x(2)).*sin(pi*x(1))]*pi;
 
 f = @(x) 2*pi^2*sin(pi*x(1,:)).*sin(pi*x(2,:));
 mu = @(x) 1;
-dirichlet_functions = @(x) [0;0;0;0];
+dirichlet_functions = @(x) [solex(x);solex(x);solex(x);solex(x)];
 neumann_functions = @(x) [-pi*sin(pi*x(1)).*cos(pi*x(2));
     pi*cos(pi*x(1)).*sin(pi*x(2));
     pi*sin(pi*x(1))*cos(pi*x(2));

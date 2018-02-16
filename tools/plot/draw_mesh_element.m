@@ -22,7 +22,7 @@ if (nargin == 4)
 end
 
 if (~color)
-    plot([x x(1)],[y y(1)],'k','Linewidth',0.5);
+    plot([x x(1)],[y y(1)],'color',[0.7 0.7 0.7],'Linewidth',0.5);
 else
     if (group == 1)
         plot([x x(1)],[y y(1)],'r','Linewidth',1);

@@ -1,5 +1,5 @@
 function [gp,weights,order] = gauss_points2D(n_gauss)
-% Returs gauss quadrature points on a 2D triangle
+% Returns gauss quadrature points on a 2D triangle
 % input=
 %           n_gauss: number of gauss points
 %

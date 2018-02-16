@@ -1,5 +1,5 @@
 function [gp,weights,order] = gauss_points1D(n_gauss)
-% Returs gauss quadrature points in 1D on the segmente (-1,1)
+% Returns gauss quadrature points in 1D on the segment (-1,1)
 % input=
 %           n_gauss: number of gauss points
 %

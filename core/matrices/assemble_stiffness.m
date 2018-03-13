@@ -82,7 +82,6 @@ if (~strcmp(fespace.mesh.type,'structured'))
             invmat = inv(mattransf);
             
             % transformation from parametric to physical
-            transf = @(x) mattransf*x + x1;
             dettransf = abs(det(mattransf));
             
             for j = 1:n_gauss

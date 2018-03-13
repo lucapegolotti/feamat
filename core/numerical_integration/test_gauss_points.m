@@ -47,7 +47,7 @@ appr_int = weights*f(gp');
 exact_int = integral(f,-1,1);
 assert(abs(appr_int-exact_int) < tol);
 
-%% Test 4: 2D 2 points
+%% Test 4: 2D 3 points
 
 [gp,weights,order] = gauss_points2D(3);
 
@@ -58,3 +58,15 @@ f = @(x) x(:,1).^2 + x(:,1).*x(:,2) - 1;
 appr_int = weights*f(gp')/2;
 
 assert(abs(appr_int + 0.375) < tol)
+
+%% Test 4: 2D 4 points
+
+[gp,weights,order] = gauss_points2D(4);
+
+assert(order == 3);
+
+f = @(x) (x(:,1) + x(:,2)).^3;
+
+appr_int = weights*f(gp')/2;
+
+assert(abs(appr_int - 0.2) < tol)

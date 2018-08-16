@@ -1,4 +1,17 @@
 function [mesh] = read_mesh(mesh_file,boundary_indicators)
+% Reads mesh from a .msh file (for example, generate by gmsh)
+% input=
+%           mesh_file: path to msh.file
+%           boundary_indicators: vector valued anonymous function @(x)
+%                                with number of components = number of
+%                                boundaries. The vector takes values 1 in
+%                                the component corresponding to a boundary
+%                                if the point x belongs to the
+%                                corresponding boundary, zero otherwise.
+%
+% output=
+%           mesh: mesh data structure
+
 
 fid = fopen(mesh_file);
 
@@ -103,5 +116,6 @@ mesh.yp = min(vertices(:,2));
 mesh.L = max(vertices(:,1)) - mesh.xp;
 mesh.H = max(vertices(:,1)) - mesh.yp;
 mesh.h = hmax;
+mesh.type = 'unstructured';
 end
 

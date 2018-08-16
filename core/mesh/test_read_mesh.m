@@ -12,7 +12,7 @@ boundary_indicators = @(x) [(norm(x) < 0.3 + tol);
                             abs(x(2)-0.5) < tol;
                             abs(x(2)+0.5) < tol];
 
-mesh = read_mesh('../../data/square_hole.msh',boundary_indicators);
+mesh = read_mesh('square_hole.msh',boundary_indicators);
 
 assert(mesh.xp == -0.5);
 assert(mesh.yp == -0.5); 

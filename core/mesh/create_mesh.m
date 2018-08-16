@@ -9,10 +9,7 @@ function [mesh] = create_mesh(xp,yp,L,H,n_elements1,n_elements2)
 %           n_elements2: number of elements in the y direction
 %
 % output=
-%           X: x coordinates of the grid
-%           Y: y coordinates of the grid
-%           vertices: vertices of the mesh
-%           connectivity: connectivity matrix
+%           mesh: mesh data structure
 
 n_elements = n_elements1*n_elements2*2;
 x = linspace(xp,xp+L,n_elements1+1);

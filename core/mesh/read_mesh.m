@@ -2,12 +2,16 @@ function [mesh] = read_mesh(mesh_file,boundary_indicators)
 % Reads mesh from a .msh file (for example, generate by gmsh)
 % input=
 %           mesh_file: path to msh.file
+%           (optional)
 %           boundary_indicators: vector valued anonymous function @(x)
 %                                with number of components = number of
 %                                boundaries. The vector takes values 1 in
 %                                the component corresponding to a boundary
 %                                if the point x belongs to the
 %                                corresponding boundary, zero otherwise.
+%                                It is necessary to provide this argument,
+%                                if the .msh does not contain any physical
+%                                entity to assign the boundary conditions.
 %
 % output=
 %           mesh: mesh data structure
@@ -20,11 +24,22 @@ if (fid == -1)
 end
 
 res = 1;
+physical_names = 0;
 while(res ~= -1)
     res = fgets(fid);
 
+    if (strcmp(res(1:end-1),'$PhysicalNames'))
+        physical_names = 1;
+    end
+
     % start reading nodes
     if (strcmp(res(1:end-1),'$Nodes') == 1)
+
+        if (~physical_names && nargin == 1)
+            error(['When no physical elements are specified in the .msh file', ...
+                   ' it is necessary to provide boundary indicators to the', ...
+                   ' read_mesh function!']);
+        end
         res = fgets(fid);
         num_elements = str2num(res(1:end-1));
 
@@ -61,7 +76,7 @@ while(res ~= -1)
                 if (strcmp(numbers{2},'1'))
                     v = str2double(numbers{6});
                     % the vertex has not been given a boundary flag yet
-                    if (vertices(v,3) == 0)
+                    if (vertices(v,3) == 0 && ~physical_names)
                         aux = boundary_indicators(vertices(v,1:2));
                         boundary_indices = find(aux ~= 0);
                         if (length(boundary_indices) == 1)
@@ -69,6 +84,19 @@ while(res ~= -1)
                         elseif (length(boundary_indices) == 2)
                             vertices(v,3:4) = boundary_indices;
                         elseif (length(boundary_indices) > 2)
+                            error(['Boundary vertices cannot belong to more than 2', ... 
+                                   ' boundaries!'])
+                        end
+                    elseif (physical_names)
+                        % if physical entities are present, we use the
+                        % same flag
+                        flag = str2num(numbers{4});
+                        if (vertices(v,3) == 0)
+                            vertices(v,3) = flag;
+                        elseif (vertices(v,4) == 0 && vertices(v,3) ~= flag)
+                            vertices(v,4) = flag;
+                        elseif (vertices(v,3) ~= flag && ...
+                                vertices(v,4) ~= flag)
                             error(['Boundary vertices cannot belong to more than 2', ... 
                                    ' boundaries!'])
                         end
@@ -76,7 +104,7 @@ while(res ~= -1)
 
                     v = str2double(numbers{7});
                     % the vertex has not been given a boundary flag yet
-                    if (vertices(v,3) == 0)
+                    if (vertices(v,3) == 0 && ~physical_names)
                         aux = boundary_indicators(vertices(v,1:2));
                         boundary_indices = find(aux ~= 0);
                         if (length(boundary_indices) == 1)
@@ -87,7 +115,20 @@ while(res ~= -1)
                             error(['Boundary vertices cannot belong to more than 2', ... 
                                    ' boundaries!'])
                         end
-                    end
+                     elseif (physical_names)
+                        % if physical entities are present, we use the
+                        % same flag
+                        flag = str2num(numbers{4});
+                        if (vertices(v,3) == 0)
+                            vertices(v,3) = flag;
+                        elseif (vertices(v,4) == 0 && vertices(v,3) ~= flag)
+                            vertices(v,4) = flag;
+                        elseif (vertices(v,3) ~= flag && ...
+                                vertices(v,4) ~= flag)
+                            error(['Boundary vertices cannot belong to more than 2', ... 
+                                   ' boundaries!'])
+                        end
+                    end 
                 end
                 % we process the triangles
                 if (strcmp(numbers{2},'2'))
@@ -114,7 +155,7 @@ mesh.elements = elements;
 mesh.xp = min(vertices(:,1));
 mesh.yp = min(vertices(:,2));
 mesh.L = max(vertices(:,1)) - mesh.xp;
-mesh.H = max(vertices(:,1)) - mesh.yp;
+mesh.H = max(vertices(:,2)) - mesh.yp;
 mesh.h = hmax;
 mesh.type = 'unstructured';
 end

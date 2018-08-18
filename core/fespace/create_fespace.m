@@ -45,6 +45,7 @@ elseif (polydegree == 'P2')
             x2 = X(index2,:);
             if (aux(indices(index1),indices(index2)) == 0)
                 aux(indices(index1),indices(index2)) = count;
+                aux(indices(index2),indices(index1)) = count;
                 bc = 0;
                 for j = 3:4
                     if (x1(j) ~= 0 && (x1(j) == x2(3) || x1(j) == x2(4)))

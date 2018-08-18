@@ -140,6 +140,13 @@ while(res ~= -1)
                     hmax = max(hmax, norm(vertices(elements(count,2),1:2) - vertices(elements(count,1),1:2)));
                     hmax = max(hmax, norm(vertices(elements(count,3),1:2) - vertices(elements(count,2),1:2)));
                     hmax = max(hmax, norm(vertices(elements(count,1),1:2) - vertices(elements(count,3),1:2)));
+                    if (vertices(elements(count,1),3) ~= 0)
+                        elements(count,4) = vertices(elements(count,1),3);
+                    elseif (vertices(elements(count,2),3) ~= 0)
+                        elements(count,4) = vertices(elements(count,2),3);
+                    elseif (vertices(elements(count,3),3) ~= 0)
+                        elements(count,4) = vertices(elements(count,3),3);
+                    end
                 end
             else
                 break;

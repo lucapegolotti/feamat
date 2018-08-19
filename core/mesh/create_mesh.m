@@ -123,7 +123,6 @@ mesh.Y = Y;
 mesh.L = L;
 mesh.H = H;
 mesh.type = 'structured';
-%mesh.type = '';
 mesh.h1 = x(2)-x(1);
 mesh.h2 = y(2)-y(1);
 mesh.h = max(mesh.h1,mesh.h2);

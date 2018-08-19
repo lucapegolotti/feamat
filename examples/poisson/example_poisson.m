@@ -27,4 +27,5 @@ neumann_functions = @(x) [0;1;1;0];
 
 sol = A\b;
 
+plot_fe_function(sol,fespace)
 export_vtk_scalar(sol,fespace,'example_poisson.vtk');

@@ -30,6 +30,16 @@ while(res ~= -1)
 
     if (strcmp(res(1:end-1),'$PhysicalNames'))
         physical_names = 1;
+        max_index = 0;
+        res = fgets(fid);
+        res = fgets(fid);
+        while (~strcmp(res(1:end-1),'$EndPhysicalNames'))
+            values = strsplit(res(1:end-1));
+            index = str2num(values{2});
+            max_index = max(max_index,index);
+            res = fgets(fid);
+        end
+        boundaries = cell(1,max_index);
     end
 
     % start reading nodes
@@ -72,7 +82,6 @@ while(res ~= -1)
             res = fgets(fid);
             if (~strcmp(res(1:end-1),'$EndElements'))
                 numbers = strsplit(res(1:end-1));
-
                 if (strcmp(numbers{2},'1'))
                     v = str2double(numbers{6});
                     % the vertex has not been given a boundary flag yet
@@ -101,7 +110,7 @@ while(res ~= -1)
                                    ' boundaries!'])
                         end
                     end
-
+                    v1 = v;
                     v = str2double(numbers{7});
                     % the vertex has not been given a boundary flag yet
                     if (vertices(v,3) == 0 && ~physical_names)
@@ -129,6 +138,8 @@ while(res ~= -1)
                                    ' boundaries!'])
                         end
                     end 
+                    v2 = v;
+                    boundaries{flag} = [boundaries{flag};v1 v2];
                 end
                 % we process the triangles
                 if (strcmp(numbers{2},'2'))
@@ -159,6 +170,7 @@ fclose(fid);
 
 mesh.vertices = vertices;
 mesh.elements = elements;
+mesh.boundaries = boundaries;
 mesh.xp = min(vertices(:,1));
 mesh.yp = min(vertices(:,2));
 mesh.L = max(vertices(:,1)) - mesh.xp;

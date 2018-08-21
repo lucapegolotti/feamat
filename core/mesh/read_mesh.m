@@ -23,6 +23,10 @@ if (fid == -1)
     error('Could not open mesh file!');
 end
 
+if (nargin == 2)
+    boundaries = cell(1,size(boundary_indicators([0;0]),1));
+end
+
 res = 1;
 physical_names = 0;
 while(res ~= -1)
@@ -73,7 +77,6 @@ while(res ~= -1)
     if (strcmp(res(1:end-1),'$Elements') == 1)
         res = fgets(fid);
         num_elements = str2num(res(1:end-1));
-
         % allocate elements
         elements = zeros(num_elements,4);
         count = 0;
@@ -96,6 +99,7 @@ while(res ~= -1)
                             error(['Boundary vertices cannot belong to more than 2', ... 
                                    ' boundaries!'])
                         end
+                        flags = boundary_indices;
                     elseif (physical_names)
                         % if physical entities are present, we use the
                         % same flag
@@ -123,6 +127,10 @@ while(res ~= -1)
                         elseif (length(boundary_indices) > 2)
                             error(['Boundary vertices cannot belong to more than 2', ... 
                                    ' boundaries!'])
+                        end
+                        flag = intersect(vertices(v1,3:4),vertices(v,3:4));
+                        if (flag(1) == 0)
+                            flag = flag(2);
                         end
                      elseif (physical_names)
                         % if physical entities are present, we use the

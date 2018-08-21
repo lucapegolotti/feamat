@@ -4,3 +4,4 @@ test/data/*
 .DS_Store
 *.vtk
 *.geo
+playground/

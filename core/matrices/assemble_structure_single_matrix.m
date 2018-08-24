@@ -54,7 +54,7 @@ for i = 1:n_elements
         transfgrad = invmat' * fespace.grads(gp(:,j));
         transfgrad_i = transfgrad(block_i,:);
         transfgrad_j = transfgrad(block_j,:);
-        stiffness_elements = dettransf*(transfgrad_i'*transfgrad_j)*weights(j)/2;
+        stiffness_elements = dettransf*(transfgrad_j'*transfgrad_i)*weights(j)/2;
         new_elements = new_elements + stiffness_elements(:);
     end
     elements_A(currindices) = new_elements;

@@ -15,7 +15,7 @@ bc_flags = fespace.bc;
 
 thereisneumann = 1;
 
-if (length(find(bc_flags)) == 4)
+if (length(find(bc_flags)) == length(bc_flags))
     thereisneumann = 0;
 end
 

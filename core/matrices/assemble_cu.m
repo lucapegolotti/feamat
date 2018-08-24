@@ -30,7 +30,6 @@ elements_M = zeros(n_functions*n_elements,1);
 indices_i = zeros(n_functions*n_elements,1);
 indices_j = zeros(n_functions*n_elements,1);
 
-
 if (~strcmp(fespace.mesh.type,'structured'))
     
     [gp,weights,~] = gauss_points2D(n_gauss);

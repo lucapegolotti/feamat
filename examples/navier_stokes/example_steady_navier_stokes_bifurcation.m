@@ -12,7 +12,7 @@ fespace_p = create_fespace(mesh,'P1',bc_flags);
 f = [0;0];
 mu = 0.1;
 
-U = 200;
+U = 400;
 
 dirichlet_functions = @(x) [(-x(2).^2+0.5^2)*U*4 0;0 0;0 0]';
 neumann_functions = @(x) [0 0;0 0;0 0]';

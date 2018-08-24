@@ -20,7 +20,7 @@ thereisneumann = 1;
 n_nodes_u = size(fespace_u.nodes,1);
 n_nodes_p = size(fespace_p.nodes,1);
 
-if (length(find(bc_flags_u)) == 4)
+if (length(find(bc_flags_u)) == length(bc_flags_u))
     thereisneumann = 0;
 end
 

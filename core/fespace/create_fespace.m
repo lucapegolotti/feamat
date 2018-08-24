@@ -4,9 +4,9 @@ function [fespace] = create_fespace(mesh,polydegree,bc_flags)
 %           mesh: mesh data structure (created with create_mesh)
 %           polydegree: string for polynomial degree. Currently supported: 
 %                       'P1' and 'P2'
-%           bc_flags: vector of flag for boundary conditions. We expect 4
-%                     flags, ordered from the bottom edge in
-%                     counterclockwise order. If a flag is equal to 0, then
+%           bc_flags: vector of flag for boundary conditions. For structured
+%                     meshes, We expect 4 flags, ordered from the bottom edge 
+%                     in counterclockwise order. If a flag is equal to 0, then
 %                     we consider Neumann boundary conditions. If a flag is
 %                     equal to 1, we consider Dirichlet boundary conditions
 % output= 

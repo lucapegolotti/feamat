@@ -6,6 +6,7 @@ function [A] = assemble_diffusive_term(fespace, mu)
     %           mu: diffusivity coefficient. It is a space-dependent or 
     %           constant 2x2 matrix.
     % Output:   diffusivity matrix.
+
     if(~isa(mu,'function_handle'))
         A = assemble_diffusive_term_component(fespace, 1, 1, mu(1,1)) + ...
             assemble_diffusive_term_component(fespace, 2, 2, mu(2,2)) + ...

@@ -7,11 +7,6 @@ function [A] = assemble_structure_single_matrix(fespace,block_i,block_j)
 % output=
 %           A: output matrix (sparse)
 
-if (strcmp(fespace.mesh.type,'unstructured'))
-    warning(['Attention! Assemble of structure matrices is not optimized for', ...
-             ' structured meshes']);
-end
-
 connectivity = fespace.connectivity;
 vertices = fespace.mesh.vertices;
 nodes = fespace.nodes;

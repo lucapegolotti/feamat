@@ -11,6 +11,12 @@ function [H,b] = assembler_linear_elasticity(fespace,fun,poisson,young,dirichlet
 %           H: system matrix
 %           b: right handside
 
+
+if (strcmp(fespace.mesh.type,'structured'))
+    warning(['Attention! Assemble of structure matrices is not optimized for', ...
+             ' structured meshes']);
+end
+
 lambda = poisson * young/((1 - 2*poisson)*(1+poisson));
 mu = young/(2*(1+poisson));
 

@@ -1,7 +1,5 @@
 function [I,code] = evaluate_fe_function(f_dofs,fespace,x_p)
 % Evaluate finite element function in point
-% ATTENTION! this functions assumes that the underlying mesh is structured
-% the function returns code=1 if the point is outside the mesh
 % input=
 %           f_dofs: values at degrees of freedom of the function          
 %           fespace: finite element space

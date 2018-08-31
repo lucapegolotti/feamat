@@ -10,20 +10,7 @@ function [A] = apply_dirichlet_bc_matrix(A,fespace,diagvalue)
 % output=
 %           A: diagonalized matrix
 
-
-n_nodes = size(A,1);
-dim2 = size(A,2);
-
-nodes = fespace.nodes;
-bc_flags = fespace.bc;
-
-indices_to_diagonalize = [];
-for i = 1:n_nodes
-    if (nodes(i,3)~=0 && bc_flags(nodes(i,3)) || ...
-        nodes(i,4) ~= 0 && bc_flags(nodes(i,4)))
-        indices_to_diagonalize = [indices_to_diagonalize;i];
-    end
-end
+indices_to_diagonalize = find_dirichlet_indices(fespace);
 
 n_indices = length(indices_to_diagonalize);
 

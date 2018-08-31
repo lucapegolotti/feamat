@@ -18,13 +18,7 @@ n_nodes = size(A,1);
 nodes = fespace.nodes;
 bc_flags = fespace.bc;
 
-indices_to_diagonalize = [];
-for i = 1:n_nodes
-    if (nodes(i,3)~=0 && bc_flags(nodes(i,3)) || ...
-        nodes(i,4) ~= 0 && bc_flags(nodes(i,4)))
-        indices_to_diagonalize = [indices_to_diagonalize;i];
-    end
-end
+indices_to_diagonalize = find_dirichlet_indices(fespace);
 
 % lifting function
 uLift = apply_dirichlet_bc_rhs(zeros(size(b)),fespace,dirichlet_functions);

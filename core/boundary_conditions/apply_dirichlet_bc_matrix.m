@@ -11,11 +11,5 @@ function [A] = apply_dirichlet_bc_matrix(A,fespace,diagvalue)
 %           A: diagonalized matrix
 
 indices_to_diagonalize = find_dirichlet_indices(fespace);
-
-n_indices = length(indices_to_diagonalize);
-
-A(indices_to_diagonalize,:) = 0;
-A(indices_to_diagonalize,indices_to_diagonalize) = spdiags(ones(n_indices,1)*diagvalue, ...
-                                                   0,n_indices,n_indices);
-
+apply_dirichlet_bc_matrix_indices(A,diagvalue,indices_to_diagonalize);
 

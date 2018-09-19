@@ -13,5 +13,13 @@ if (strcmp(fespace.mesh.type,'structured'))
     solgrid = reshape(sol(1:size(fespace.mesh.vertices,1)),size(X,1),size(X,2));
     vtkwrite(filename,'structured_grid',X,Y,Z,'scalars','u', solgrid,'binary')
 else
-    error('Mesh type not supported!');
+    mesh = fespace.mesh;
+    x = mesh.vertices(:,1);
+    y = mesh.vertices(:,2);
+    n_vertices = length(x);
+    data_title = 'scalar plot';
+    data_struct.type = 'scalar';
+    data_struct.name = 'u';
+    data_struct.data = sol.p(1:n_vertices);
+    vtk_write_triangular_grid_and_data([filename,'.vtk'],data_title,[x y 0*x],mesh.elements(:,1:3),data_struct,false);
 end

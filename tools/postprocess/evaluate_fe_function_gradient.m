@@ -12,12 +12,12 @@ mesh = fespace.mesh;
 x = x_p(1);
 y = x_p(2);
 if (x < mesh.xp || x > mesh.xp+mesh.L)
-    I = 0;
+    I = [0;0];
     code = 1;
     return;
 end
 if (y < mesh.yp || y > mesh.yp+mesh.H)
-    I = 0;
+    I = [0;0];
     code = 1;
     return;
 end
@@ -56,13 +56,21 @@ elseif (strcmp(mesh.type,'unstructured'))
     aux = mesh.vertices(:,1:2) - x_p(:)';
     distances = sqrt(aux(:,1).^2 + aux(:,2).^2);
     
-    % search closest vertex to input point
-    [~,index] = min(distances);
+    % search closest 2 vertices to input point
+    [~,index1] = min(distances);
+    distances(index1) = Inf;
+    
+    [~,index2] = min(distances);    
 
-    elements_with_vertex = (mesh.elements(:,1) == index) + ...
-                           (mesh.elements(:,2) == index) + ...
-                           (mesh.elements(:,3) == index);
-    indices_elements = find(elements_with_vertex);
+    elements_with_vertex1 = (mesh.elements(:,1) == index1) + ...
+                           (mesh.elements(:,2) == index1) + ...
+                           (mesh.elements(:,3) == index1);                    
+    indices_elements = find(elements_with_vertex1);
+    
+    elements_with_vertex2 = (mesh.elements(:,1) == index2) + ...
+                           (mesh.elements(:,2) == index2) + ...
+                           (mesh.elements(:,3) == index2);                    
+    indices_elements = unique([indices_elements;find(elements_with_vertex2)]);
     
     found = 0;
     for i = 1:size(indices_elements,1)
@@ -70,20 +78,19 @@ elseif (strcmp(mesh.type,'unstructured'))
         x1 = mesh.vertices(mesh.elements(idx,1),1:2)';
         x2 = mesh.vertices(mesh.elements(idx,2),1:2)';
         x3 = mesh.vertices(mesh.elements(idx,3),1:2)';
-
         P12 = (x1-x2)'; P23 = (x2-x3)'; P31 = (x3-x1)';
         
         s1 = sign(det([P31;P23]))*sign(det([x3'-x_p(:)';P23]));
         s2 = sign(det([P12;P31]))*sign(det([x1'-x_p(:)';P31]));
         s3 = sign(det([P23;P12]))*sign(det([x2'-x_p(:)';P12]));
-        is_inside =  s1 >= -1e-16 * s2 >= -1e-16 * s3 > -1e-16;
+        is_inside =  s1 >= -1e-5 & s2 >= -1e-5 & s3 > -1e-5;
         if (is_inside)
             found = 1;
             break;
         end
     end
     if (found == 0)
-        I = 0;
+        I = [0;0];
         code = 1;
         return;
     end

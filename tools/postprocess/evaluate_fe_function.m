@@ -56,13 +56,21 @@ elseif (strcmp(mesh.type,'unstructured'))
     aux = mesh.vertices(:,1:2) - x_p(:)';
     distances = sqrt(aux(:,1).^2 + aux(:,2).^2);
     
-    % search closest vertex to input point
-    [~,index] = min(distances);
+    % search closest 2 vertices to input point
+    [~,index1] = min(distances);
+    distances(index1) = Inf;
+    
+    [~,index2] = min(distances);    
 
-    elements_with_vertex = (mesh.elements(:,1) == index) + ...
-                           (mesh.elements(:,2) == index) + ...
-                           (mesh.elements(:,3) == index);
-    indices_elements = find(elements_with_vertex);
+    elements_with_vertex1 = (mesh.elements(:,1) == index1) + ...
+                           (mesh.elements(:,2) == index1) + ...
+                           (mesh.elements(:,3) == index1);                    
+    indices_elements = find(elements_with_vertex1);
+    
+    elements_with_vertex2 = (mesh.elements(:,1) == index2) + ...
+                           (mesh.elements(:,2) == index2) + ...
+                           (mesh.elements(:,3) == index2);                    
+    indices_elements = unique([indices_elements;find(elements_with_vertex2)]);
     
     found = 0;
     for i = 1:size(indices_elements,1)
@@ -70,15 +78,30 @@ elseif (strcmp(mesh.type,'unstructured'))
         x1 = mesh.vertices(mesh.elements(idx,1),1:2)';
         x2 = mesh.vertices(mesh.elements(idx,2),1:2)';
         x3 = mesh.vertices(mesh.elements(idx,3),1:2)';
-
-        P12 = (x1-x2)'; P23 = (x2-x3)'; P31 = (x3-x1)';
-        is_inside = sign(det([P31;P23]))*sign(det([x3'-x_p(:)';P23])) >= 0 & ...
-        sign(det([P12;P31]))*sign(det([x1'-x_p(:)';P31])) >= 0 & ...
-        sign(det([P23;P12]))*sign(det([x2'-x_p(:)';P12])) >= 0 ;
-
-        if (is_inside)
+        
+        % check if the point is on a line
+        if ((abs((norm(x1' - x_p) + norm(x2' - x_p))/norm(x1 - x2) - 1) < 1e-3) || ...
+            (abs((norm(x2' - x_p) + norm(x3' - x_p))/norm(x2 - x3) - 1) < 1e-3) || ...
+            (abs((norm(x3' - x_p) + norm(x1' - x_p))/norm(x3 - x1) - 1) < 1e-3))
             found = 1;
             break;
+        else
+%             plot(x1(1),x1(2),'.r','Markersize',10)
+%             hold on
+%             plot(x2(1),x2(2),'.r','Markersize',10)
+%             plot(x3(1),x3(2),'.r','Markersize',10)
+%             plot(x_p(1),x_p(2),'.g','Markersize',10)
+%             hold off
+
+            P12 = (x1-x2)'; P23 = (x2-x3)'; P31 = (x3-x1)';
+            is_inside = sign(det([P31;P23]))*sign(det([x3'-x_p(:)';P23])) >= 0 & ...
+            sign(det([P12;P31]))*sign(det([x1'-x_p(:)';P31])) >= 0 & ...
+            sign(det([P23;P12]))*sign(det([x2'-x_p(:)';P12])) >= 0 ;
+
+            if (is_inside)
+                found = 1;
+                break;
+            end
         end
     end
     if (found == 0)

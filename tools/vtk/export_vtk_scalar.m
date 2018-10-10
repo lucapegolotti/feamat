@@ -20,6 +20,6 @@ else
     data_title = 'scalar plot';
     data_struct.type = 'scalar';
     data_struct.name = 'u';
-    data_struct.data = sol.p(1:n_vertices);
+    data_struct.data = sol;
     vtk_write_triangular_grid_and_data([filename,'.vtk'],data_title,[x y 0*x],mesh.elements(:,1:3),data_struct,false);
 end

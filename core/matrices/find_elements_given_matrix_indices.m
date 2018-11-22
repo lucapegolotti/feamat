@@ -1,4 +1,12 @@
-function elements = find_elements_given_matrix_indices(fespace_1,fespace_2,indices)
+function elements = find_elements_given_matrix_indices( fespace_1, fespace_2, indices )
+% Given the FE space and the indices corresponding to matrix entries, it
+% finds the elements contributing to populate those entries
+% input=
+%           fespace1: finite elemenet space trial variable
+%           fespace2: finite elemenet space test variable
+%           indices: array containing the indices
+% output=
+%           elements: elements of the mesh
 
 elements_1 = fespace_1.connectivity;
 elements_2 = fespace_2.connectivity;

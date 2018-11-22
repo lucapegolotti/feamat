@@ -1,12 +1,15 @@
 function [A] = assemble_stiffness_elementlist(mu, fespace, elementlist )
-% Assemble stiffness matrix
+% Assemble poisson matrix with boundary conditions
 % input=
-%           mu: scalar or anonymous function of the diffusion coefficient.
-%           Note that if mu is a scalar the code is more efficient (for
-%           structured meshes)
-%           fespace: finite element space
+%           fespace: finite elemnet space
+%           fun: anonymous function of the forcing term
+%           mu: anonymous function or scalar of the diffusion coefficient
+%               If scalar, the code is optimized on structured meshes
+%           dirichlet_functions: Dirichlet boundary data
+%           neumann_functions: Neumann_boundary data
+%           elementlist: array containing the elements
 % output=
-%           A: stiffness matrix (sparse)
+%           A: system matrix
 
 constant_mu = 0;
 

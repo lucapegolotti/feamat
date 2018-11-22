@@ -1,4 +1,11 @@
 function found_elements = find_elements_given_vector_indices( fespace, indices )
+% Given the FE space and the indices corresponding to vector entries, it
+% finds the elements contributing to populate those entries
+% input=
+%           fespace: finite elemenet space trial variable
+%           indices: array containing the indices
+% output=
+%           found_elements: elements of the mesh
 
 elements = fespace.connectivity;
 

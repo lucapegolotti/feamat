@@ -35,3 +35,4 @@ method.maxit = 100;
 [sol,err,it] = solve_fluid_system(A,b,fespace_u,fespace_p,method);
 
 plot_fe_fluid_function(sol,'U','contourf');
+export_vtk_fluid(sol,'test','U')

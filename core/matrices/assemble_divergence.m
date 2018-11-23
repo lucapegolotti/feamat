@@ -25,7 +25,7 @@ n_elements = size(connectivity_u,1);
 n_nodes_u = size(nodes_u,1);
 n_nodes_p = size(nodes_p,1);
 
-n_gauss = 3;
+n_gauss = 4;
 [gp,weights,~] = gauss_points2D(n_gauss);
 
 elements_B = zeros(nlocalfunctions_u*nlocalfunctions_p*n_elements,1);

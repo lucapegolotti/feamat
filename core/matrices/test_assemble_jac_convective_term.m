@@ -32,6 +32,7 @@ assert(norm(C1*x-C2*x) < tol);
 epsilon = 1e-9;
 
 mesh = create_mesh(0,0,1,1,6,7);
+mesh.type = 'unstructured';
 fespace_u = create_fespace(mesh,'P2',[0 0 0 0]);
 
 u = rand(size(fespace_u.nodes,1)*2,1);

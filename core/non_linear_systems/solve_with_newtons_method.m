@@ -14,14 +14,12 @@ function [x,err,it] = solve_with_newtons_method(f,x0,jac,tol,maxit)
 
 res = f(x0);
 err = norm(res);
-
 it = 0;
 x = x0;
 while (err > tol && it < maxit)
     it = it + 1;
     disp(['Newton iteration ',num2str(it),' ...']);
     J = jac(x);
-    
     x = x - J\res;
     res = f(x);
     err = norm(res);

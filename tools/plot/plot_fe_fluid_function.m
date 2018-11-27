@@ -90,7 +90,7 @@ elseif (strcmp(sol.fespace_u.mesh.type,'unstructured'))
                fespace_u.mesh.elements(:,1:3),N,20);
         hold on
         %plot_fe_function(N,fespace_u);
-        set(h,'edgecolor','none');
+        % set(h,'edgecolor','none');
 %         h = triquiver(fespace_u.mesh.elements(:,1:3),fespace_u.mesh.vertices(:,1), ...
 %                   fespace_u.mesh.vertices(:,2), sol.u1(1:n_vertices),sol.u2(1:n_vertices),10);
 %         shading interp

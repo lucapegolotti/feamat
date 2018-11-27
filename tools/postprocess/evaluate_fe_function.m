@@ -1,124 +1,71 @@
 function [I,code] = evaluate_fe_function(f_dofs,fespace,x_p)
-% Evaluate finite element function in point
+% Evaluate finite element function in point or multiple points
 % input=
-%           f_dofs: values at degrees of freedom of the function          
+%           f_dofs: values at degrees of freedom of the function
 %           fespace: finite element space
-%           x_p: point of interest
+%           x_p: point(s) of interest. If x_p is a matrix of points,
+%                the size must be 2 x (nb points).
 % output=
-%           I: value of the function
-%           code: 0 if ok, 1 if the point is outside the domain
-mesh = fespace.mesh;
-
-x = x_p(1);
-y = x_p(2);
-if (x < mesh.xp || x > mesh.xp+mesh.L)
-    I = 0;
-    code = 1;
-    return;
+%           I: value(s) of the function. Vector of size nb points.
+%           code: 0 if ok, 1 if the point is outside the domain.
+%                 If multiple points, vector of size nb points.
+if (size(x_p,1) ~= 2)
+    x_p = x_p';
 end
-if (y < mesh.yp || y > mesh.yp+mesh.H)
-    I = 0;
-    code = 1;
-    return;
-end
-
-if (strcmp(mesh.type,'structured'))
-
-    % find element that contains (x,y)
-    xx = mesh.X(1:end-1,1);
-    yy = mesh.Y(1,1:end-1);
-
-    L = length(xx);
-
-    indx = max(find(xx <= x));
-    indy = max(find(yy <= y));
-
-    elindex = 2*L*(indy-1) + indx;
-
-    % check if (x,y) is in this element or the one above
-    indv = fespace.connectivity(elindex,:);
-
-    x1 = mesh.vertices(indv(1),1:2)';
-    x2 = mesh.vertices(indv(2),1:2)';
-    x3 = mesh.vertices(indv(3),1:2)';
-
-    m1 = (x3(2)-x1(2))/(x3(1)-x1(1));
-    m2 = (y-x1(2))/(x-x1(1));
-
-    % then we chose the wrong element: choosing the one above
-    if (m1 < m2)
-        indv = fespace.connectivity(elindex+L,:);
-        x1 = mesh.vertices(indv(1),1:2)';
-        x2 = mesh.vertices(indv(2),1:2)';
-        x3 = mesh.vertices(indv(3),1:2)';
-    end
-elseif (strcmp(mesh.type,'unstructured'))
-    aux = mesh.vertices(:,1:2) - x_p(:)';
-    distances = sqrt(aux(:,1).^2 + aux(:,2).^2);
+nb_points = size(x_p,2);
+I = zeros(nb_points,1);
+code = zeros(nb_points,1);
+for i = 1:size(x_p,2)
+    [index,x1,x2,x3] = find_element_containing_point(fespace.mesh,x_p(:,i));
     
-    % search closest 2 vertices to input point
-    [~,index1] = min(distances);
-    distances(index1) = Inf;
-    
-    [~,index2] = min(distances);    
-
-    elements_with_vertex1 = (mesh.elements(:,1) == index1) + ...
-                           (mesh.elements(:,2) == index1) + ...
-                           (mesh.elements(:,3) == index1);                    
-    indices_elements = find(elements_with_vertex1);
-    
-    elements_with_vertex2 = (mesh.elements(:,1) == index2) + ...
-                           (mesh.elements(:,2) == index2) + ...
-                           (mesh.elements(:,3) == index2);                    
-    indices_elements = unique([indices_elements;find(elements_with_vertex2)]);
-    
-    found = 0;
-    for i = 1:size(indices_elements,1)
-        idx = indices_elements(i);
-        x1 = mesh.vertices(mesh.elements(idx,1),1:2)';
-        x2 = mesh.vertices(mesh.elements(idx,2),1:2)';
-        x3 = mesh.vertices(mesh.elements(idx,3),1:2)';
+    % perturb the point as it may lay on a line
+    if (index == -1)
+        count = 0;
+        rot = [0 -1; 1 0];
+        pert = [1e-8;0];
+        while (index == -1 && count < 4)
+            count = count + 1;
+            x_p_new = x_p(:,i) + pert;
+            [index,x1,x2,x3] = find_element_containing_point(fespace.mesh,x_p_new);
+            pert = rot*pert;
+        end
         
-        % check if the point is on a line
-        if ((abs((norm(x1' - x_p) + norm(x2' - x_p))/norm(x1 - x2) - 1) < 1e-3) || ...
-            (abs((norm(x2' - x_p) + norm(x3' - x_p))/norm(x2 - x3) - 1) < 1e-3) || ...
-            (abs((norm(x3' - x_p) + norm(x1' - x_p))/norm(x3 - x1) - 1) < 1e-3))
-            found = 1;
-            break;
-        else
-%             plot(x1(1),x1(2),'.r','Markersize',10)
-%             hold on
-%             plot(x2(1),x2(2),'.r','Markersize',10)
-%             plot(x3(1),x3(2),'.r','Markersize',10)
-%             plot(x_p(1),x_p(2),'.g','Markersize',10)
-%             hold off
-
-            P12 = (x1-x2)'; P23 = (x2-x3)'; P31 = (x3-x1)';
-            is_inside = sign(det([P31;P23]))*sign(det([x3'-x_p(:)';P23])) >= 0 & ...
-            sign(det([P12;P31]))*sign(det([x1'-x_p(:)';P31])) >= 0 & ...
-            sign(det([P23;P12]))*sign(det([x2'-x_p(:)';P12])) >= 0 ;
-
-            if (is_inside)
-                found = 1;
-                break;
-            end
+        pert = [1e-8;1e-8];
+        count = 0;
+        while (index == -1 && count < 4)
+            count = count + 1;
+            x_p_new = x_p(:,i) + pert;
+            [index,x1,x2,x3] = find_element_containing_point(fespace.mesh,x_p_new);
+            pert = rot*pert;
         end
     end
-    if (found == 0)
+    
+    % perturb the point as it may lay on a line
+    count = 0;
+    while (index == -1 && count < 4)
+        count = count + 1;
+        if (count < 3)
+            x_p_new = x_p(:,i) + [(-1)^count * 1e-5;0];
+        else
+            x_p_new = x_p(:,i) + [0;(-1)^count * 1e-5];
+        end
+        [index,x1,x2,x3] = find_element_containing_point(fespace.mesh,x_p_new);
+    end
+    
+    if (index == -1)
         I = 0;
         code = 1;
-        return;
+        return
     end
-    indv = fespace.connectivity(idx,:);
+    
+    indv = fespace.connectivity(index,:);
+    mattransf = [x2-x1 x3-x1];
+    
+    transf = @(xq) mattransf\(xq-x1);
+    transfun = fespace.functions(transf(x_p(:,i)))';
+    
+    I(i) = transfun*f_dofs(indv(1:end-1));
+    code(i) = 0;
 end
-
-mattransf = [x2-x1 x3-x1];
-
-transf = @(xq) mattransf\(xq-x1);    
-
-transfun = fespace.functions(transf([x;y]))';
-
-I = transfun*f_dofs(indv(1:end-1));
-code = 0;
 
 

@@ -1,0 +1,59 @@
+function [array] = build_fom_affine_components( operator, fem_specifics )
+% Assemble fom affine matrix for elliptic scalar problems
+% input=
+%           operator: operator corresponding to stiffness matrix or RHS 
+%           fem_specifics: struct containing the information to build the
+%           mesh, the fespace and the chosen model
+% output=
+%           array: struct containing the affine stiffness matrices in COO format
+    
+    considered_model = fem_specifics.model;
+    
+    if ( strcmp( considered_model, 'thermal_block' ) == 0 ) && strcmp( operator, 'A' )
+        error('The chosen model is not supported');
+    end
+
+    [~, fespace] = set_fem_simulation( fem_specifics );
+
+    dirichlet_functions = @(x) [0;0;0;0];
+    neumann_functions = @(x) [1;0;0;0];
+
+    % forcing term
+    f = @(x) 0*x(1,:);
+
+    if operator == 'A'
+
+        mu = @(x) (x(1,:)<0.5).*(x(2,:)<0.5);
+        [ A, b ] = assembler_poisson( fespace,f,mu,dirichlet_functions,neumann_functions );
+
+        [i,j,val] = find( A );
+        array.A0 = [i,j,val];
+
+        mu = @(x) (x(1,:)>=0.5).*(x(1,:)<1.0).*(x(2,:)>=0.0).*(x(2,:)<0.5);
+        [ A, b ] = assembler_poisson( fespace,f,mu,dirichlet_functions,neumann_functions );
+
+        [i,j,val] = find( A );
+        array.A1 = [i,j,val];
+
+        mu = @(x) (x(1,:)>=0.0).*(x(1,:)<0.5).*(x(2,:)>=0.5).*(x(2,:)<1.0);
+        [ A, b ] = assembler_poisson( fespace,f,mu,dirichlet_functions,neumann_functions );
+
+        [i,j,val] = find( A );
+        array.A2 = [i,j,val];
+
+        mu = @(x) 1.0 * (x(1,:)>=0.5).*(x(1,:)<1.0).*(x(2,:)>=0.5).*(x(2,:)<1.0) ;
+        [ A, b ] = assembler_poisson( fespace,f,mu,dirichlet_functions,neumann_functions );
+
+        [i,j,val] = find( A );
+        array.A3 = [i,j,val];
+
+    end
+    
+    if operator == 'f'
+        mu = @(x) 1.0 * (x(1,:)>=0.5).*(x(1,:)<1.0).*(x(2,:)>=0.5).*(x(2,:)<1.0) ;
+        [ A, b ] = assembler_poisson( fespace,f,mu,dirichlet_functions,neumann_functions );
+        array.f0 = b;
+    end
+    
+end
+

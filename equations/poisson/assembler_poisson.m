@@ -1,4 +1,4 @@
-function [A,b] = assembler_poisson(fespace,fun,mu,dirichlet_functions,neumann_functions)
+function [A,b] = assembler_poisson(fespace,fun,mu,dirichlet_functions,neumann_functions, varargin )
 % Assemble poisson matrix with boundary conditions
 % input=
 %           fespace: finite elemnet space
@@ -11,6 +11,13 @@ function [A,b] = assembler_poisson(fespace,fun,mu,dirichlet_functions,neumann_fu
 %           A: system matrix
 %           b: right handside
 
+use_full_element_list = true;
+
+if nargin > 5
+    use_full_element_list = false;
+    element_list = varargin{1};
+end
+
 bc_flags = fespace.bc;
 
 thereisneumann = 1;
@@ -19,7 +26,12 @@ if (length(find(bc_flags)) == length(bc_flags))
     thereisneumann = 0;
 end
 
-A = assemble_stiffness(mu,fespace);
+if use_full_element_list
+    A = assemble_stiffness( mu, fespace );
+else
+    A = assemble_stiffness_elementlist( mu, fespace, element_list );
+end
+
 b = assemble_rhs(fespace,fun);
 
 if (thereisneumann)

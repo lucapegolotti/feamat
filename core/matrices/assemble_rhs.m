@@ -27,7 +27,7 @@ if (~isa(fun,'function_handle'))
     return;
 end
 
-n_gauss = 3;
+n_gauss = 6;
 [gp,weights,~] = gauss_points2D(n_gauss);
 
 b = zeros(n_nodes,1);

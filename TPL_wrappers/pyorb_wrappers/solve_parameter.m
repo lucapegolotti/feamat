@@ -13,7 +13,7 @@ function [sol] = solve_parameter( param, fem_specifics )
     neumann_functions = @(x) [1;0;0;0];
 
     % forcing term
-    f = @(x) 0*x(1,:);55
+    f = @(x) 0*x(1,:);
 
     current_model = fem_specifics.model;
 

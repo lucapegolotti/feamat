@@ -38,7 +38,6 @@ function [array] = assemble_fom_matrix( param, fem_specifics, varargin )
     if nargin == 2
         [ A, b ] = assembler_poisson( fespace, f, mu,dirichlet_functions, neumann_functions );
     else
-        display('using assembler with varargin')
         element_list = varargin{1};
         [ A, b ] = assembler_poisson( fespace, f, mu,dirichlet_functions, neumann_functions, element_list );
     end

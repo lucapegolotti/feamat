@@ -9,8 +9,8 @@ function [array] = build_fom_affine_components( operator, fem_specifics )
     
     considered_model = fem_specifics.model;
     
-    if ( strcmp( considered_model, 'thermal_block' ) == 0 ) && strcmp( operator, 'A' )
-        error('The chosen model is not supported');
+    if ( strcmp( considered_model, 'thermal_block' ) == 0 ) && ( strcmp( operator, 'f' ) == 0 )
+        error('This operator for the chosen model is not supported');
     end
 
     [~, fespace] = set_fem_simulation( fem_specifics );

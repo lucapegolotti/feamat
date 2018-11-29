@@ -10,6 +10,6 @@ function [elements] = find_mdeim_elements_fom_specifics( fem_specifics, indices_
 
     [~, fespace] = set_fem_simulation( fem_specifics );
 
-    elements = find_elements_given_matrix_indices( fespace, fespace, indices_mat )
+    elements = find_elements_given_matrix_indices( fespace, fespace, indices_mat );
 
 end

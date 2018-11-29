@@ -34,5 +34,3 @@ end
 
 % delete repetitions
 elements = unique(elements);
-
-length(elements)

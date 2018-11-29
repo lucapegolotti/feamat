@@ -33,11 +33,7 @@ elements_A = zeros(n_functions*n_elements,1);
 indices_i = zeros(n_functions*n_elements,1);
 indices_j = zeros(n_functions*n_elements,1);
 
-display(num2str(n_functions*n_elements))
-
 if (~strcmp(fespace.mesh.type,'structured'))
-    
-    display('entering the if-!structured if')
     
     [gp,weights,~] = gauss_points2D(n_gauss);
     if (~constant_mu)
@@ -100,8 +96,6 @@ if (~strcmp(fespace.mesh.type,'structured'))
     end
 else
     
-    display('entering the if-structured if !!')
-
     [fespace,gp] = add_members_structured_meshes(fespace, n_gauss);
     if (~constant_mu)
         for i = elementlist(:)'
@@ -155,11 +149,6 @@ no_indices = (indices_i == 0);
 indices_i(no_indices) = [];
 indices_j(no_indices) = [];
 elements_A(no_indices) = [];
-
-size(indices_i)
-size(indices_j)
-size(elements_A)
-length(elements_A(elements_A ~= 0))
 
 A = sparse(indices_i,indices_j,elements_A,n_nodes,n_nodes);
 

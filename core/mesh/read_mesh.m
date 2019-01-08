@@ -29,18 +29,15 @@ end
 
 res = 1;
 physical_names = 0;
-
-allocated_elements_vertex = 0;
-
 while(res ~= -1)
     res = fgets(fid);
 
-    if (strcmp(res(1:end-1),'$PhysicalNames'))
+    if (compare_string(res,'$PhysicalNames'))
         physical_names = 1;
         max_index = 0;
         res = fgets(fid);
         res = fgets(fid);
-        while (~strcmp(res(1:end-1),'$EndPhysicalNames'))
+        while (~compare_string(res,'$EndPhysicalNames'))
             values = strsplit(res(1:end-1));
             index = str2num(values{2});
             max_index = max(max_index,index);
@@ -50,7 +47,7 @@ while(res ~= -1)
     end
 
     % start reading nodes
-    if (strcmp(res(1:end-1),'$Nodes') == 1)
+    if (compare_string(res,'$Nodes') == 1)
 
         if (~physical_names && nargin == 1)
             error(['When no physical elements are specified in the .msh file', ...
@@ -59,18 +56,14 @@ while(res ~= -1)
         end
         res = fgets(fid);
         num_elements = str2num(res(1:end-1));
-        
-        if (~allocated_elements_vertex)
-            elements_containing_vertex = cell(num_elements,1);
-            allocated_elements_vertex = 1;
-        end
+
         % allocate vertices
         vertices = zeros(num_elements,4);
         count = 0;
         while (1)
             count = count + 1;
             res = fgets(fid);
-            if (~strcmp(res(1:end-1),'$EndNodes'))
+            if (~compare_string(res,'$EndNodes'))
                 numbers = strsplit(res(1:end-1));
                 vertices(count,1) = str2double(numbers{2});
                 vertices(count,2) = str2double(numbers{3});
@@ -79,9 +72,9 @@ while(res ~= -1)
             end
         end
     end
-    
+
     % start reading elements
-    if (strcmp(res(1:end-1),'$Elements') == 1)
+    if (compare_string(res,'$Elements') == 1)
         res = fgets(fid);
         num_elements = str2num(res(1:end-1));
         % allocate elements
@@ -90,7 +83,7 @@ while(res ~= -1)
         hmax = 0;
         while (1)
             res = fgets(fid);
-            if (~strcmp(res(1:end-1),'$EndElements'))
+            if (~compare_string(res,'$EndElements'))
                 numbers = strsplit(res(1:end-1));
                 if (strcmp(numbers{2},'1'))
                     v = str2double(numbers{6});
@@ -159,18 +152,10 @@ while(res ~= -1)
                 % we process the triangles
                 if (strcmp(numbers{2},'2'))
                     count = count + 1;
-                    num1 = str2double(numbers{6});
-                    num2 = str2double(numbers{7});
-                    num3 = str2double(numbers{8});
-
-                    elements(count,1) = num1;
-                    elements(count,2) = num2;
-                    elements(count,3) = num3;
-
-                    elements_containing_vertex{num1} = [elements_containing_vertex{num1};count];
-                    elements_containing_vertex{num2} = [elements_containing_vertex{num2};count];
-                    elements_containing_vertex{num3} = [elements_containing_vertex{num3};count];
-
+                    elements(count,1) = str2double(numbers{6});
+                    elements(count,2) = str2double(numbers{7});
+                    elements(count,3) = str2double(numbers{8});
+                    
                     hmax = max(hmax, norm(vertices(elements(count,2),1:2) - vertices(elements(count,1),1:2)));
                     hmax = max(hmax, norm(vertices(elements(count,3),1:2) - vertices(elements(count,2),1:2)));
                     hmax = max(hmax, norm(vertices(elements(count,1),1:2) - vertices(elements(count,3),1:2)));
@@ -192,7 +177,6 @@ end
 fclose(fid);
 
 mesh.vertices = vertices;
-mesh.elements_containing_vertex = elements_containing_vertex;
 mesh.elements = elements;
 mesh.boundaries = boundaries;
 mesh.xp = min(vertices(:,1));
@@ -200,7 +184,9 @@ mesh.yp = min(vertices(:,2));
 mesh.L = max(vertices(:,1)) - mesh.xp;
 mesh.H = max(vertices(:,2)) - mesh.yp;
 mesh.h = hmax;
-mesh.triang = triangulation(mesh.elements(:,1:3),mesh.vertices(:,1),mesh.vertices(:,2));
 mesh.type = 'unstructured';
-end
 
+    function result = compare_string(read_str,target)
+        result = strcmp(read_str(1:min(length(read_str),length(target))),target) == 1;
+    end
+end

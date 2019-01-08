@@ -117,29 +117,12 @@ elseif (strcmp(sol.fespace_u.mesh.type,'unstructured'))
 
     elseif (what == 'P')
         fespace_p = sol.fespace_p;
-
-        p = sol.p;
-
-        n1 = size(fespace_p.mesh.X,1);
-        n2 = size(fespace_p.mesh.X,2);
-
-        [~,c] = contourf(fespace_p.mesh.X,fespace_p.mesh.Y,reshape(p,n1,n2));
-        c.LineStyle = 'none';
-
-        h = colorbar;  
-
-        if (nargin >= 5)
-            if (mlim == 0 && Mlim == 0)
-                mlim = 0; 
-                Mlim = 1;
-            end
-            set(h,'YLim',[mlim*0.9 Mlim*1.1])
-            caxis([ mlim*0.9 Mlim*1.1 ])
-        else
-            m = min(p);
-            M = max(p);
-            c.LevelList = linspace(m,M,20);
-        end
+        
+        [~,h] = tricontf(fespace_p.mesh.vertices(:,1),fespace_p.mesh.vertices(:,2), ...
+               fespace_p.mesh.elements(:,1:3),sol.p,20);
+        hold on
+        set(h,'edgecolor','none');
+        
     end
 else
     error('Type of mesh is not supported!');

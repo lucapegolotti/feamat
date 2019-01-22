@@ -21,6 +21,14 @@ function [array] = build_fom_affine_components( operator, fem_specifics )
     % forcing term
     f = @(x) 0*x(1,:);
 
+    current_model = fem_specifics.model;
+
+    if strcmp( current_model, 'nonaffine' )
+        f = @(x) 0*x(1,:) + 1;
+        dirichlet_functions = @(x) [0;0;0;0];
+        neumann_functions   = @(x) [0;0;0;0];
+    end
+    
     if operator == 'A'
 
         mu = @(x) (x(1,:)<0.5).*(x(2,:)<0.5);
@@ -53,7 +61,9 @@ function [array] = build_fom_affine_components( operator, fem_specifics )
         mu = @(x) 1.0 * (x(1,:)>=0.5).*(x(1,:)<1.0).*(x(2,:)>=0.5).*(x(2,:)<1.0) ;
         [ A, b ] = assembler_poisson( fespace,f,mu,dirichlet_functions,neumann_functions );
         array.f0 = b;
+
     end
     
 end
+
 

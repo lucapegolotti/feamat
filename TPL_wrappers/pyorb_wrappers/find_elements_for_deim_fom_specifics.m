@@ -10,7 +10,7 @@ function elements = find_elements_for_deim_fom_specifics( fem_specifics, indices
 
     [~, fespace] = set_fem_simulation( fem_specifics );
 
-    elements = find_elements_for_deim( fespace, indices );
+    elements = find_elements_given_vector_indices( fespace, indices );
 
 end
 

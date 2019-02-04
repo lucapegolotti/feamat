@@ -1,4 +1,4 @@
-function [mesh] = create_mesh(xp,yp,L,H,n_elements1,n_elements2)
+function [mesh] = create_mesh(xp,yp,L,H,n_elements1,n_elements2, varargin )
 % Generates rectangular mesh.
 % input=
 %           xp: x coordinate of the bottom left corner
@@ -10,6 +10,20 @@ function [mesh] = create_mesh(xp,yp,L,H,n_elements1,n_elements2)
 %
 % output=
 %           mesh: mesh data structure
+
+save_load_mesh = (nargin > 6) && ( ~strcmp( varargin{1}, '') );
+
+if save_load_mesh
+   file_name_mesh = strcat( varargin{1}, '.mat');
+   file_already_exists = exist( file_name_mesh, 'file');
+   
+   if file_already_exists == 2
+       disp( 'I am loading the mesh since it exists' );
+       load( file_name_mesh, '-mat', 'mesh' );
+       return
+   end
+   
+end
 
 n_elements = n_elements1*n_elements2*2;
 x = linspace(xp,xp+L,n_elements1+1);
@@ -123,8 +137,14 @@ mesh.Y = Y;
 mesh.L = L;
 mesh.H = H;
 mesh.type = 'structured';
+% mesh.type = 'unstructured';
 mesh.h1 = x(2)-x(1);
 mesh.h2 = y(2)-y(1);
 mesh.h = max(mesh.h1,mesh.h2);
+
+if save_load_mesh
+    save( file_name_mesh, 'mesh' );
+end
+
 end
 

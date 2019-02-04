@@ -7,8 +7,8 @@ function [array] = assemble_fom_rhs( param, fem_specifics, varargin )
 % output=
 %           array: struct containing the stiffness matrix in COO format
 
-    [~, fespace] = set_fem_simulation( fem_specifics );
-
+    [~, fespace] = set_fem_simulation( fem_specifics, fem_specifics.mesh_name );
+    
     % forcing term
     f = @(x) 0*x(1,:);
 
@@ -25,16 +25,25 @@ function [array] = assemble_fom_rhs( param, fem_specifics, varargin )
         neumann_functions   = @(x) [0;0;0;0];
         
     end
-    
+
     if strcmp( current_dirichlet, 'Y' )
         non_hom_dirichlet_functions = @(x) [1;0;0;0];
-        [ A, b ] = assembler_poisson( fespace, f, mu, non_hom_dirichlet_functions, neumann_functions );
-        uL = b * 0.0;
-        uL = apply_dirichlet_bc_rhs( uL, fespace, non_hom_dirichlet_functions );
-        b = b - A * uL;
-        b = apply_dirichlet_bc_rhs( b, fespace, dirichlet_functions );
+        if nargin == 2
+            [ A, b ] = assembler_poisson( fespace, f, mu, dirichlet_functions, neumann_functions );
+            uL = b * 0.0;
+            uL = apply_dirichlet_bc_rhs( uL, fespace, non_hom_dirichlet_functions );
+            b = b - A * uL;
+            b = apply_dirichlet_bc_rhs( b, fespace, dirichlet_functions );
+        else
+%           varargin{1} is the element list;
+%           varargin{2} are the indices;
+            uL = zeros( size(fespace.nodes, 1), 1 );
+            uL = apply_dirichlet_bc_rhs( uL, fespace, non_hom_dirichlet_functions );
+            b = assemble_rhs_elementlist( fespace, f, mu, varargin{1}, uL );
+            b = apply_dirichlet_bc_rhs( b, fespace, dirichlet_functions );
+        end
     else
-        [ A, b ] = assembler_poisson( fespace, f, mu, dirichlet_functions, neumann_functions );
+        [ ~, b ] = assembler_poisson( fespace, f, mu, dirichlet_functions, neumann_functions );
     end
 
     if nargin > 2
@@ -42,6 +51,5 @@ function [array] = assemble_fom_rhs( param, fem_specifics, varargin )
     end
 
     array.f = b;
-    
 end
 

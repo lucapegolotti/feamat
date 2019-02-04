@@ -7,8 +7,8 @@ function [array] = assemble_fom_matrix( param, fem_specifics, varargin )
 % output=
 %           array: struct containing the stiffness matrix in COO format
 
-    [~, fespace] = set_fem_simulation( fem_specifics );
-
+    [~, fespace] = set_fem_simulation( fem_specifics, fem_specifics.mesh_name );
+    
     dirichlet_functions = @(x) [0;0;0;0];
     neumann_functions = @(x) [1;0;0;0];
 
@@ -38,8 +38,6 @@ function [array] = assemble_fom_matrix( param, fem_specifics, varargin )
         
         array.A = [indeces_list, elements_A];
     end
-    
-
     
 end
 

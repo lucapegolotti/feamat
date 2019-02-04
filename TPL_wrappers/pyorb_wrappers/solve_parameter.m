@@ -7,7 +7,7 @@ function [sol] = solve_parameter( param, fem_specifics )
 % output=
 %           sol: struct containing the solution
 
-    [~, fespace] = set_fem_simulation( fem_specifics );
+    [~, fespace] = set_fem_simulation( fem_specifics, fem_specifics.mesh_name );
 
     dirichlet_functions = @(x) [0;0;0;0];
     neumann_functions = @(x) [1;0;0;0];

@@ -1,4 +1,4 @@
-function [mesh, fespace] = set_fem_simulation( fem_specifics, current_bc_flags )
+function [mesh, fespace] = set_fem_simulation( fem_specifics, varargin )
 % Assemble fom affine matrix for elliptic scalar problems
 % input=
 %           fem_specifics: struct containing the information to build the
@@ -19,9 +19,16 @@ bottom_left_corner_y = 0;
 L = 1.0;
 H = 1.0;
 
-mesh = create_mesh(bottom_left_corner_x, ...
-               bottom_left_corner_y, ...
-               L,H,n_elements_x,n_elements_y);
+file_name = '';
+
+if nargin > 1
+    file_name = varargin{1};
+end
+
+mesh = create_mesh( bottom_left_corner_x, ...
+                    bottom_left_corner_y, ...
+                    L,H,n_elements_x,n_elements_y, ... 
+                    file_name );
 
 current_model = fem_specifics.model;
                       

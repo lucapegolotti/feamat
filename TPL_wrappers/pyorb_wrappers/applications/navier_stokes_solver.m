@@ -3,6 +3,10 @@ function [sol] = navier_stokes_solver( param, fem_specifics )
 mesh_file = fem_specifics.mesh_name;
 
 mesh = read_mesh( mesh_file );
+n_out1 = [1; -1/15];
+n_out2 = [1;  1/3];
+n_out1 = n_out1/norm(n_out1);
+n_out2 = n_out2 /norm(n_out2);
 
 bc_flags    = [1 0 1 0 1 1];
 
@@ -24,6 +28,14 @@ neumann_functions             = @(x) [0 0;0 0;0 0;0 0;0 0;0 0]';
 [A_stokes, b_stokes] = assembler_steady_stokes( fespace_u, fespace_p, f, mu, dirichlet_stokes_functions, ...
                                          neumann_functions);
 u_lifting_stokes = A_stokes \ b_stokes;
+
+
+% dirichlet_stokes_functions_ex = @(x) [0 0; 0 0; 0 0; 0 0; 0 0; 0 0]';
+% neumann_functions             = @(x) [0 0;0 0;0 0;0 0;0 0;0 0]';
+% 
+% [A_stokes_ex, b_stokes_ex] = assembler_steady_stokes( fespace_u, fespace_p, f, mu, dirichlet_stokes_functions, ...
+%                                          neumann_functions);
+% u_lifting_stokes = A_stokes_ex \ b_stokes_ex;
 
 
 
@@ -72,5 +84,20 @@ axis equal
 norm(sol_lifting.u1)
 norm(sol_lifting.u2)
 
+inlet_flag = 6;
+outlet1_flag = 2;
+outlet2_flag = 4;
+M_inlet   = assemble_boundary_mass( fespace_u, inlet_flag );
+M_outlet1 = assemble_boundary_mass( fespace_u, outlet1_flag );
+M_outlet2 = assemble_boundary_mass( fespace_u, outlet2_flag );
+
+Qinlet   = ( ones(1, length(sol_lifting.u1) ) * M_inlet * sol_lifting.u1 )
+Qoutlet1 = ( ones(1, length(sol_lifting.u1) ) * M_outlet1 * ( [sol_lifting.u1 sol_lifting.u2] * n_out1 ) )
+Qoutlet2 = ( ones(1, length(sol_lifting.u1) ) * M_outlet2 * ( [sol_lifting.u1 sol_lifting.u2] * n_out2 ) )
+
+Qoutlet1 / Qinlet + Qoutlet2 / Qinlet
+
+
+16 / 3 * 0.4^3 / Qinlet
 
 end

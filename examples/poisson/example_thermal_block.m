@@ -53,8 +53,6 @@ sol = uL;
 sol(iN)  = A\b;
 
 
-
-
 % plot of the solution
 plot_fe_function(sol,fespace)
 axis equal

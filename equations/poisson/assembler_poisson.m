@@ -1,7 +1,7 @@
 function [A,b] = assembler_poisson(fespace,fun,mu,dirichlet_functions,neumann_functions, varargin )
 % Assemble poisson matrix with boundary conditions
 % input=
-%           fespace: finite elemnet space
+%           fespace: finite element space
 %           fun: anonymous function of the forcing term
 %           mu: anonymous function or scalar of the diffusion coefficient
 %               If scalar, the code is optimized on structured meshes

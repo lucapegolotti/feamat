@@ -11,7 +11,7 @@ function b = apply_neumann_bc(b,fespace,neumann_functions,varargin)
 % output=
 %           b: modified right handside
 n_gauss1d = 2;
-if (nargin == 4)
+if nargin == 4
     n_gauss1d = varargin{1};
 end
 

@@ -7,27 +7,30 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics )
 % output=
 %           sol: struct containing the solution
 
-    [~, fespace] = set_fem_simulation( fem_specifics, [1,1,1,1] );
+    bc = [1;1;0;1];
+    [~, fespace] = set_fem_simulation( fem_specifics, bc );
     
     % TERMS TO BE ADDED IN fem_specifics!!!!
     n_time_instances = fem_specifics.number_of_time_instances;
     T = fem_specifics.final_time;
-    Theta = fem_specifics.theta; % parameter of theta method in (0,1) 
+    Theta = fem_specifics.theta; % parameter of theta-method in [0,1]
     
     % computation of the time step
     dt = T / n_time_instances;
 
-    dirichlet_functions = @(x) [0;0;0;0];
-    neumann_functions = @(x) [0;0;0;0];
+    dirichlet_functions = @(x)   [0;0;0;0];
+    neumann_functions   = @(x)   [0;0;0;0];
 
     % space forcing term
-    f_s = @(x) (8*pi^2-1) * sin(2*pi*x(1,:)) .* sin(2*pi*x(2,:));
+    %f_s = @(x) (8*pi^2-1) * sin(2*pi*x(1,:)) .* sin(2*pi*x(2,:));
+    f_s = @(x) 1 + 0*x(1,:) + 0*x(2,:);
     
     % time forcing term
-    f_t = @(t) exp(-t);
+    f_t = @(t) exp(-t.^2);
     
     % initial condition
-    u_init = @(x) sin(2*pi*x(:,1)) .* sin(2*pi*x(:,2));
+    %u_init = @(x) sin(2*pi*x(:,1)) .* sin(2*pi*x(:,2));
+    u_init = @(x) 0 + 0*x(:,1) + 0*x(:,2);
 
     current_model = fem_specifics.model;
 
@@ -36,7 +39,9 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics )
 %            * exp( - ( ( x(1,:)-param(4) ) .* ( x(1,:)-param(4) ) + ( x(2,:)-param(5) ) .* ( x(2,:)-param(5) ) ) / param(6) );
 %     end
     
-    mu = build_diffusion( param, current_model );
+    mu_x = build_diffusion( param, current_model );
+    
+    c_x = build_reaction( param, current_model );
     
 %     if strcmp( current_model, 'nonaffine' )        
 %         f_s = @(x) 0*x(1,:) + 1;
@@ -45,9 +50,17 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics )
 %     end
     
     % evaluation of the time independent matrices and rhs
-    A_no_bc = assemble_stiffness( mu, fespace );
-    M_no_bc = assemble_mass( fespace );
+    A_no_bc = assemble_stiffness( mu_x, fespace );
+    M_no_bc = assemble_mass( fespace, c_x );
+    M_no_bc_time = assemble_mass( fespace );
     b_no_bc = assemble_rhs( fespace, f_s );
+    
+    % assembling of the lhs matrix, considering bc
+    LHS = M_no_bc_time + Theta * dt * (A_no_bc + M_no_bc );
+    LHS = apply_dirichlet_bc_matrix(LHS,fespace,1);
+    
+    % performing LU fatorization of the matrix outside of the time loop
+    [L,U,P] = lu(LHS);
     
     % evaluation of boundary conditions
     bc_flags = fespace.bc;
@@ -71,6 +84,7 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics )
     % starting time loop
     count = 1;
     for t = dt:dt:T
+        
         % evaluation of the time part of the force at new time instant
         f1 = f_t(t);
         
@@ -78,22 +92,21 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics )
         % bc imposition
         F0 = f0 * b_no_bc;
         F1 = f1 * b_no_bc;
-        
-        % assembling of the lhs matrix, without considering bc
-        LHS = M_no_bc + Theta * dt * A_no_bc;
-        
+ 
         % assembling of the rhs vector, without considering bc
-        RHS = (M_no_bc - (1 - Theta) * dt  * A_no_bc) * u(:,count) + Theta * F1 * dt + (1 - Theta) * F0 * dt;
+        RHS = (M_no_bc_time - (1 - Theta) * dt  * (A_no_bc + M_no_bc))...
+              * u(:,count) + Theta * F1 * dt + (1 - Theta) * F0 * dt;
         
-        % imposition of bc in classical way on lhs and rhs
+        % imposition of bc in classical way rhs
         if (thereisneumann)
            RHS = apply_neumann_bc(RHS,fespace,neumann_functions); 
         end
 
-        [LHS,RHS] = apply_dirichlet_bc(LHS,RHS,fespace,dirichlet_functions);
+        RHS = apply_dirichlet_bc_rhs(RHS,fespace,dirichlet_functions);
 
-        % system resolution
-        u(:,count+1) = LHS\RHS;
+        % system resolution using LU factorization
+        temp = L \ (P*RHS);
+        u(:,count+1) = U \ temp;
 
         % update the time part of the force and the counter   
         f0 = f1;

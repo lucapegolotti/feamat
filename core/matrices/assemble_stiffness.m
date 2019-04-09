@@ -1,4 +1,4 @@
-function [A] = assemble_stiffness(mu,fespace)
+function [A] = assemble_stiffness(mu, fespace )
 % Assemble stiffness matrix
 % input=
 %           mu: scalar or anonymous function of the diffusion coefficient.

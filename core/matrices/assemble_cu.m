@@ -62,7 +62,7 @@ if (~strcmp(fespace.mesh.type,'structured'))
             elements_M(currindices) = new_elements;
         end
     else
-              for i = 1:n_elements
+        for i = 1:n_elements
             indices = connectivity(i,1:end-1);
             x1 = vertices(indices(1),1:2)';
             x2 = vertices(indices(2),1:2)';

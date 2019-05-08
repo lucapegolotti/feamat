@@ -1,16 +1,21 @@
-function [sol] = solve_parameter( param, fem_specifics )
+function [sol] = solve_parameter( param, fem_specifics, varargin )
 % Assemble fom matrix for elliptic scalar problems
 % input=
 %           param: vector of parameters
 %           fem_specifics: struct containing the information to build the
 %           mesh and the fespace
+%           varargin: test case number (optional)
 % output=
 %           sol: struct containing the solution
 
     if (isfield( fem_specifics, 'final_time' ))
         % in this case it means that the problem is unsteady, since more
         % fields (like 'final_time') have been added in such a case!!!
-        sol = solve_parameter_unsteady( param, fem_specifics );
+        if nargin > 2
+            sol = solve_parameter_unsteady( param, fem_specifics, varargin{1} );
+        else
+            sol = solve_parameter_unsteady( param, fem_specifics );
+        end
     else
         % otherwise we proceed in the usual fashion, with the steady
         % problem

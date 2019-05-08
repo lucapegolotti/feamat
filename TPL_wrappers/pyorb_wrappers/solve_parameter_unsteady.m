@@ -1,13 +1,25 @@
-function [sol] = solve_parameter_unsteady( param, fem_specifics )
+function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
 % Assemble fom matrix for elliptic unsteady scalar problems
 % input=
 %           param: vector of parameters
 %           fem_specifics: struct containing the information to build the
 %           mesh, the fespace and the time marching scheme
+%           varargin: test case number (optional)
 % output=
 %           sol: struct containing the solution
 
-    bc = [1;1;0;1];
+    if nargin > 2
+        caso = varargin{1};
+    else
+        caso = 1;
+    end
+    
+    switch caso
+        case 1
+            bc = [1;1;0;1];
+        case 2
+            bc = [1;1;1;1];
+    end
     [~, fespace] = set_fem_simulation( fem_specifics, bc );
     
     % TERMS TO BE ADDED IN fem_specifics!!!!
@@ -16,21 +28,38 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics )
     Theta = fem_specifics.theta; % parameter of theta-method in [0,1]
     
     % computation of the time step
-    dt = T / n_time_instances;
-
-    dirichlet_functions = @(x)   [0;0;0;0];
-    neumann_functions   = @(x)   [0;0;0;0];
-
-    % space forcing term
-    %f_s = @(x) (8*pi^2-1) * sin(2*pi*x(1,:)) .* sin(2*pi*x(2,:));
-    f_s = @(x) 1 + 0*x(1,:) + 0*x(2,:);
+    dt = double(T) / double(n_time_instances);
     
-    % time forcing term
-    f_t = @(t) exp(-t.^2);
+    switch caso
+        case 1
+
+            dirichlet_functions = @(x)   [0;0;0;0];
+            neumann_functions   = @(x)   [0;0;0;0];
+
+            % space forcing term
+            f_s = @(x) 1 + 0*x(1,:) + 0*x(2,:);
+
+            % time forcing term
+            f_t = @(t) exp(-t.^2);
+
+            % initial condition
+            u_init = @(x) 0*x(:,1) + 0*x(:,2);
+            
+        case 2
+            
+            dirichlet_functions = @(x)   [0;0;0;0];
+            neumann_functions   = @(x)   [0;0;0;0];
+
+            % space forcing term
+            f_s = @(x) -(x(1,:)-x(1,:).^2).*(x(2,:)-x(2,:).^2) + 2*(x(1,:)+x(2,:)-x(1,:).^2-x(2,:).^2);
+
+            % time forcing term
+            f_t = @(t) exp(-t);
+
+            % initial condition
+            u_init = @(x) (x(:,1)-x(:,1).^2).*(x(:,2)-x(:,2).^2);
+    end
     
-    % initial condition
-    %u_init = @(x) sin(2*pi*x(:,1)) .* sin(2*pi*x(:,2));
-    u_init = @(x) 0 + 0*x(:,1) + 0*x(:,2);
 
     current_model = fem_specifics.model;
 
@@ -81,9 +110,10 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics )
     % evaluation of the time part of the force at t=0
     f0 = f_t(t);
     
-    % starting time loop
+    % starting time loop    
     count = 1;
     for t = dt:dt:T
+        
         
         % evaluation of the time part of the force at new time instant
         f1 = f_t(t);

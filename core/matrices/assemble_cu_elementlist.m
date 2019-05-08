@@ -1,10 +1,11 @@
-function [M] = assemble_cu(c,fespace)
+function [M] = assemble_cu_elementlist(c,fespace,elementlist)
 % Assemble the discretization of the term c*u
 % input=
 %           c: scalar or anonymous function of the  coefficient.
 %           Note that if c is a scalar the code is more efficient (for
 %           structured meshes)
 %           fespace: finite element space
+%           elementlist: list of the considered elements
 % output=
 %           M: matrix (sparse)
 
@@ -34,7 +35,7 @@ if (~strcmp(fespace.mesh.type,'structured'))
     
     [gp,weights,~] = gauss_points2D(n_gauss);
     if (~constant_c)
-        for i = 1:n_elements
+        for i = elementlist(:)'
             indices = connectivity(i,1:end-1);
             x1 = vertices(indices(1),1:2)';
             x2 = vertices(indices(2),1:2)';
@@ -62,7 +63,7 @@ if (~strcmp(fespace.mesh.type,'structured'))
             elements_M(currindices) = new_elements;
         end
     else
-        for i = 1:n_elements
+        for i = elementlist(:)'
             indices = connectivity(i,1:end-1);
             x1 = vertices(indices(1),1:2)';
             x2 = vertices(indices(2),1:2)';
@@ -93,7 +94,7 @@ if (~strcmp(fespace.mesh.type,'structured'))
 else
     [fespace,gp] = add_members_structured_meshes(fespace, n_gauss);
     if (~constant_c)
-        for i = 1:n_elements
+        for i = elementlist(:)'
             indices = connectivity(i,1:end-1);
             x1 = vertices(indices(1),1:2)';
             
@@ -121,7 +122,7 @@ else
             elements_M(currindices) = new_elements;
         end
     else
-        for i = 1:n_elements
+        for i = elementlist(:)'
             indices = connectivity(i,1:end-1);
             
             [I1,I2] = meshgrid(indices,indices);
@@ -143,5 +144,6 @@ end
 M = sparse(indices_i,indices_j,elements_M,n_nodes,n_nodes);
 
 end
+
 
 

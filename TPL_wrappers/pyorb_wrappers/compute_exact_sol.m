@@ -50,9 +50,11 @@ function [tt,exact_sol] = compute_exact_sol( param, fem_specifics, bc_flags, dir
     
     % applying time independent bc on rhs
     if (thereisneumann)
-           b = apply_neumann_bc(b_no_bc,fespace,neumann_functions); 
-    end 
-    b = apply_dirichlet_bc_rhs(b,fespace,dirichlet_functions);
+        b = apply_neumann_bc(b_no_bc,fespace,neumann_functions);
+        b = apply_dirichlet_bc_rhs(b,fespace,dirichlet_functions);
+    else 
+        b = apply_dirichlet_bc_rhs(b_no_bc,fespace,dirichlet_functions);
+    end
     
     % evaluation of the initial condition
     u0 = u_init(fespace.nodes(:,1:2));  
@@ -61,7 +63,7 @@ function [tt,exact_sol] = compute_exact_sol( param, fem_specifics, bc_flags, dir
     tspan = 0:dt:fem_specifics.final_time;
     
     % include mass matrix option
-    opts = odeset('Mass',M_time, 'RelTol', 1e-9, 'AbsTol',1e-9);
+    opts = odeset('Mass',M_time, 'RelTol', 1e-8, 'AbsTol',1e-8);
     
     % adjust rhs vector to take care of the time dependent part of the
     % forcing term

@@ -152,4 +152,6 @@ elements_A(no_indices) = [];
 
 A = sparse(indices_i,indices_j,elements_A,n_nodes,n_nodes);
 
+end
+
 

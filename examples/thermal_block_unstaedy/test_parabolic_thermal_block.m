@@ -150,6 +150,7 @@ for spatial_dim = dims
 end
 
 %% Plotting Area
+
 % Plot Exact solution
 x = fespace.nodes(:,1);
 y = fespace.nodes(:,2);

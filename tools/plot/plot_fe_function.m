@@ -6,8 +6,11 @@ function [h]= plot_fe_function(vec,fespace,varargin)
 %           vec: vector of degrees of freedom
 %           fespace: finite element space
 %           (optional)
-%           'contour' or 'contourf' to change visualization mode
-%
+%           'contour' or 'contourf' to change visualization mode; 'surf'
+%           default option
+%           (optional2)
+%           z axis limits in surf visualization; need to explicit 'surf'
+%           option
 
 n_vertices = size(fespace.mesh.vertices,1);
 
@@ -19,8 +22,11 @@ if (strcmp(fespace.mesh.type,'structured'))
     n1 = size(fespace.mesh.X,1);
     n2 = size(fespace.mesh.X,2);
 
-    if (nargin == 2)
+    if (nargin == 2) || ((nargin>=3) && (strcmp(varargin{1},'surf')))
         [h] = surf(fespace.mesh.X,fespace.mesh.Y,reshape(vec(1:n_vertices),n1,n2),'EdgeColor','none','LineStyle','none','FaceLighting','phong');
+        if nargin==4
+            zlim(varargin{2})
+        end
     else
         if (strcmp(varargin{1},'contourf'))
             [h] = contourf(fespace.mesh.X,fespace.mesh.Y,reshape(vec(1:n_vertices),n1,n2),varargin{2});
@@ -32,9 +38,12 @@ if (strcmp(fespace.mesh.type,'structured'))
         end
     end
 else
-    if (nargin == 2)
+    if (nargin == 2) || ((nargin>=3) && (strcmp(varargin{1},'surf')))
         [h] = trisurf(fespace.mesh.elements(:,1:3),fespace.mesh.vertices(:,1), ...
                       fespace.mesh.vertices(:,2),vec(1:n_vertices));
+        if nargin==4
+            zlim(varargin{2})
+        end
     else
         if (strcmp(varargin{1},'contourf'))
             [h] = tricontf(fespace.mesh.vertices(:,1),fespace.mesh.vertices(:,2), ...

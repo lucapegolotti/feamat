@@ -4,12 +4,12 @@ clc
 
 %% Convergence test
 
-dims = [50,100]; % choose the dimension of the FE space
+dims = [50, 100]; % choose the dimension of the FE space
 N_dims = length(dims);
 
 % choose between case 1 (reference solution computed via ode23t) and case 2
 % (reference solution computed from an analytical expression)
-caso = 2; 
+caso = 1; 
 
 count_dims = 1;
 for spatial_dim = dims
@@ -67,8 +67,8 @@ for spatial_dim = dims
             u_init = @(x) (x(:,1)-x(:,1).^2).*(x(:,2)-x(:,2).^2);
 
 
-            %times = [ 1 2 4 8 16 32 64 128 ]';
-            times = 25;
+            times = [ 1 2 4 8 16 32 54 128 ]';
+            %times = 25;
             time_steps = fem_specifics.final_time ./ times;
             
     end
@@ -105,13 +105,13 @@ for spatial_dim = dims
         
         switch caso
             case 1
-                err_L2(count,spatial_dim) = compute_norm(fespace,sol.u(:,end) - exact_sol(end,:)','L2');
-                err_H1(count,spatial_dim) = compute_norm(fespace,sol.u(:,end) - exact_sol(end,:)','H1');
+                err_L2(count,count_dims) = compute_norm(fespace,sol.u(:,end) - exact_sol(end,:)','L2');
+                err_H1(count,count_dims) = compute_norm(fespace,sol.u(:,end) - exact_sol(end,:)','H1');
                 
             case 2
                 
-                err_L2(count,spatial_dim) = compute_L2_error(fespace,sol.u(:,end),exact_sol);
-                err_H1(count,spatial_dim) = compute_H1_error(fespace,sol.u(:,end),exact_sol,grad_exact_sol);
+                err_L2(count,count_dims) = compute_L2_error(fespace,sol.u(:,end),exact_sol);
+                err_H1(count,count_dims) = compute_H1_error(fespace,sol.u(:,end),exact_sol,grad_exact_sol);
                 
         end
 
@@ -120,7 +120,7 @@ for spatial_dim = dims
     figure(1)
     set(gcf, 'Units', 'Normalized', 'OuterPosition', [0.3, 0.25, 0.7, 0.75]);
     subplot(N_dims,1,count_dims)
-    loglog(time_steps, err_L2(:,spatial_dim), '-o');
+    loglog(time_steps, err_L2(:,count_dims), '-o');
     hold on
     grid on
     loglog(time_steps, time_steps/100, '--');
@@ -130,11 +130,11 @@ for spatial_dim = dims
     legend('L2 error', 'dt','Location','Best');
     
 
-    order_L2(:,spatial_dim) = log(err_L2(2:end,spatial_dim)./err_L2(1:end-1,spatial_dim)) ./ log(time_steps(2:end)./time_steps(1:end-1));
+    order_L2(:,count_dims) = log(err_L2(2:end,count_dims)./err_L2(1:end-1,count_dims)) ./ log(time_steps(2:end)./time_steps(1:end-1));
 
     figure(2)
     subplot(N_dims,1,count_dims)
-    loglog(time_steps, err_H1(:,spatial_dim), '-o');
+    loglog(time_steps, err_H1(:,count_dims), '-o');
     hold on
     grid on
     loglog(time_steps, time_steps/100, '--');
@@ -144,7 +144,7 @@ for spatial_dim = dims
     legend('H1 error', 'dt','Location', 'Best');
     set(gcf, 'Units', 'Normalized', 'OuterPosition', [0.3, 0.25, 0.7, 0.75]);
 
-    order_H1(:,spatial_dim) = log(err_H1(2:end,spatial_dim)./err_H1(1:end-1,spatial_dim)) ./ log(time_steps(2:end)./time_steps(1:end-1));
+    order_H1(:,count_dims) = log(err_H1(2:end,count_dims)./err_H1(1:end-1,count_dims)) ./ log(time_steps(2:end)./time_steps(1:end-1));
     
     count_dims = count_dims +1;
 end

@@ -1,5 +1,6 @@
 function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
-% Assemble fom matrix for elliptic unsteady scalar problems
+%Solve the unsteady fom problem using a suitable multistep time-marching
+%scheme
 % input=
 %           param: vector of parameters
 %           fem_specifics: struct containing the information to build the
@@ -26,11 +27,12 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
     n_time_instances = fem_specifics.number_of_time_instances;
     T = fem_specifics.final_time;
     Theta = fem_specifics.theta; % parameter of theta-method in [0,1]
+    step_number = fem_specifics.step_number_fom; %number of steps in multistep implementation
     
     % computation of the time step
     dt = double(T) / double(n_time_instances);
     
-    switch caso
+     switch caso
         case 1
 
             dirichlet_functions = @(x)   [0;0;0;0];
@@ -59,24 +61,12 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
             % initial condition
             u_init = @(x) (x(:,1)-x(:,1).^2).*(x(:,2)-x(:,2).^2);
     end
-    
 
     current_model = fem_specifics.model;
-
-%     if strcmp( current_model, 'nonaffine_thermal_block' )
-%        f_s = @(x) ( 1. / param(6) ) ... 
-%            * exp( - ( ( x(1,:)-param(4) ) .* ( x(1,:)-param(4) ) + ( x(2,:)-param(5) ) .* ( x(2,:)-param(5) ) ) / param(6) );
-%     end
     
     mu_x = build_diffusion( param, current_model );
     
     c_x = build_reaction( param, current_model );
-    
-%     if strcmp( current_model, 'nonaffine' )        
-%         f_s = @(x) 0*x(1,:) + 1;
-%         dirichlet_functions = @(x) [0;0;0;0];
-%         neumann_functions   = @(x) [0;0;0;0];
-%     end
     
     % evaluation of the time independent matrices and rhs
     A_no_bc = assemble_stiffness( mu_x, fespace );
@@ -84,9 +74,17 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
     M_no_bc_time = assemble_mass( fespace );
     b_no_bc = assemble_rhs( fespace, f_s );
     
+    % getting the lhs multiplicative coefficient
+    if step_number == 0
+        lhs_coeff = Theta;
+    else
+        coeffs = get_multistep_coefficients(step_number);
+        lhs_coeff = coeffs(1);
+    end
+    
     % assembling of the lhs matrix, considering bc
-    LHS = M_no_bc_time + Theta * dt * (A_no_bc + M_no_bc );
-    LHS = apply_dirichlet_bc_matrix(LHS,fespace,1);
+    LHS = M_no_bc_time + lhs_coeff * dt * (A_no_bc + M_no_bc );
+    LHS = apply_dirichlet_bc_matrix(LHS, fespace, 1);
     
     % performing LU fatorization of the matrix outside of the time loop
     [L,U,P] = lu(LHS);
@@ -98,8 +96,11 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
         thereisneumann = 0;
     end
     
+    % defining the fem dimension
+    fem_dimension = length(fespace.nodes(:,1));
+    
     % initialization of the solution matrix
-    u = zeros(length(fespace.nodes(:,1)), n_time_instances);
+    u = zeros(fem_dimension, n_time_instances);
 
     % initial time
     t = 0.0;
@@ -107,39 +108,86 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
     % evaluation of the initial condition
     u(:,1) = u_init(fespace.nodes(:,1:2));
     
-    % evaluation of the time part of the force at t=0
-    f0 = f_t(t);
+    %evaluation of the initial timesteps, if needed by the multistep method
+    if step_number >= 2
+         sol = compute_exact_sol(param, fem_specifics, bc_flags, dirichlet_functions,...
+                  neumann_functions, f_s, f_t, u_init, step_number-1);
+         u(:, 2:step_number) = sol.u_exact;
+    end
+     
+     %pre-assembling of the vectors that will be involved in the rhs
+     %computation
+     if step_number >= 1
+         rhs_mat = zeros(fem_dimension, step_number);
+         for step = 1:step_number
+             rhs_mat(:, step) = (A_no_bc + M_no_bc) * u(:, step);
+         end
+     end
+    
+    % evaluation of the time part of the force at the needed initial time
+    % instants
+    if step_number == 0
+        f0 = f_t(t);
+    else
+        f0 = zeros(step_number, 1);
+        for step = 1:step_number
+            f0(step) = f_t(t+(step_number-1)*dt);
+        end
+    end       
     
     % starting time loop    
-    count = 1;
-    for t = dt:dt:T
-        
+    count = step_number;
+    for t = step_number*dt:dt:T   
         
         % evaluation of the time part of the force at new time instant
         f1 = f_t(t);
         
         % multiplication of the time forces with the rhs, without considering
         % bc imposition
-        F0 = f0 * b_no_bc;
-        F1 = f1 * b_no_bc;
- 
+        if step_number == 0
+            F = [f0* b_no_bc; f1*b_no_bc];
+        else
+            F = zeros(length(fespace.nodes(:,1)), step_number+1);
+            for step = 1:step_number
+                F(:,step) = f0(step) * b_no_bc;
+            end
+            F(:,end) = f1 * b_no_bc;
+        end
+
         % assembling of the rhs vector, without considering bc
-        RHS = (M_no_bc_time - (1 - Theta) * dt  * (A_no_bc + M_no_bc))...
-              * u(:,count) + Theta * F1 * dt + (1 - Theta) * F0 * dt;
+        if step_number == 0
+            RHS = (M_no_bc_time - (1 - Theta) * dt  * (A_no_bc + M_no_bc))...
+                  * u(:,count) + Theta * F(fem_dimension+1:end) * dt + (1 - Theta) * F(1:fem_dimension) * dt;
+        else
+           RHS =  M_no_bc_time * u(:, count);
+           for step = 1:step_number+1
+               RHS = RHS + coeffs(step) * dt * F(:, end-step+1);
+            if step > 1
+                RHS = RHS - coeffs(step) * dt * rhs_mat(:, end-step+2);
+            end
+           end
+        end      
         
         % imposition of bc in classical way rhs
         if (thereisneumann)
-           RHS = apply_neumann_bc(RHS,fespace,neumann_functions); 
+           RHS = apply_neumann_bc(RHS, fespace, neumann_functions); 
         end
 
-        RHS = apply_dirichlet_bc_rhs(RHS,fespace,dirichlet_functions);
+        RHS = apply_dirichlet_bc_rhs(RHS, fespace, dirichlet_functions);
 
         % system resolution using LU factorization
         temp = L \ (P*RHS);
         u(:,count+1) = U \ temp;
 
-        % update the time part of the force and the counter   
-        f0 = f1;
+        % update the time part of the force and the counter  
+        if step_number >= 1
+            f0(1:end-1) = f0(2:end);
+            f0(end) = f1;
+            rhs_mat(:, end-1) = rhs_mat(:, 2:end);
+            rhs_mat(:, end) = (A_no_bc + M_no_bc) * u(:, count+1);
+        else
+            f0 = f1;
+        end
         count = count + 1;
         
     end

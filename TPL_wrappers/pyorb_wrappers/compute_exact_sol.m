@@ -1,34 +1,40 @@
-function [tt,exact_sol] = compute_exact_sol( param, fem_specifics, bc_flags, dirichlet_functions, neumann_functions, f_s, f_t, u_init )
-% Assemble fom matrix for elliptic unsteady scalar problems
+function [sol] = compute_exact_sol( param, fem_specifics, bc_flags, dirichlet_functions, neumann_functions, f_s, f_t, u_init, timestep_number )
+% Computing the "exact" solution of the problem using ode23t
 % input=
 %           param: vector of parameters
 %           fem_specifics: struct containing the information to build the
 %           mesh, the fespace and the time marching scheme
+%           bc_flags: flags encoding the boundary conditions of the problem
+%           dirichlet_functions: dirichlet boundary conditions
+%           neumann_functions: neumann boundary conditions
+%           f_s: spatial component of the forcing term
+%           f_t: time component of the forcing term
+%           u_init: initial condition
+%           timestep_number: number of timesteps at which the exact
+%           solution has to be computed
 % output=
-%           exact_sol: exact solution computed using ode23t
+%           sol: struct containing the computed solution at the desired
+%           timesteps and the timesteps themselves
+
 
     [~, fespace] = set_fem_simulation( fem_specifics, bc_flags );
     
-    T = fem_specifics.final_time;
-    
-    dt = T / 10000;
+    if timestep_number ~= "all"
+        T =  cast((fem_specifics.final_time / ...
+                        fem_specifics.number_of_time_instances) * timestep_number, 'double');
+         % divinding the reference timestep into 10-times smaller timesteps to
+         % gain accuracy
+         dt = T / (10*timestep_number);
+    else
+        T = fem_specifics.final_time;
+        dt = T / 1000;
+    end
 
     current_model = fem_specifics.model;
-
-%     if strcmp( current_model, 'nonaffine_thermal_block' )
-%        f_s = @(x) ( 1. / param(6) ) ... 
-%            * exp( - ( ( x(1,:)-param(4) ) .* ( x(1,:)-param(4) ) + ( x(2,:)-param(5) ) .* ( x(2,:)-param(5) ) ) / param(6) );
-%     end
     
     mu_x = build_diffusion( param, current_model );
     
     c_x = build_reaction( param, current_model );
-    
-%     if strcmp( current_model, 'nonaffine' )        
-%         f_s = @(x) 0*x(1,:) + 1;
-%         dirichlet_functions = @(x) [0;0;0;0];
-%         neumann_functions   = @(x) [0;0;0;0];
-%     end
 
     % evaluation of boundary conditions
     bc_flags = fespace.bc;
@@ -57,20 +63,26 @@ function [tt,exact_sol] = compute_exact_sol( param, fem_specifics, bc_flags, dir
     end
     
     % evaluation of the initial condition
-    u0 = u_init(fespace.nodes(:,1:2));  
+    y0 = u_init(fespace.nodes(:,1:2));  
     
     % definition of the time interval 
-    tspan = 0:dt:fem_specifics.final_time;
+    tspan = 0:dt:T;
     
     % include mass matrix option
-    opts = odeset('Mass',M_time, 'RelTol', 1e-8, 'AbsTol',1e-8);
+    opts = odeset('Mass', M_time, 'RelTol', 1e-8, 'AbsTol',1e-8);
     
     % adjust rhs vector to take care of the time dependent part of the
     % forcing term
-    b_adj = adjust_rhs(b,f_t,fespace);
+    b_adj = adjust_rhs(b, f_t, fespace);
     
     % resolution
-    [tt, exact_sol] = ode23t(@(t,u) -(A+M)*u + b_adj(t).*f_t(t),tspan, u0, opts);
+    [tt, exact_sol] = ode23t(@(t,u) -(A+M)*u + b_adj(t).*f_t(t), tspan, y0, opts);
+    exact_sol = exact_sol';
+    
+    % extraction of the timesteps of interest
+    sol.t_exact = tt(11:10:end);
+    sol.u_exact = exact_sol(:,11:10:end);
+    
 end   
     
     

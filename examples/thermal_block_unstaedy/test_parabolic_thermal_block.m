@@ -28,6 +28,7 @@ for spatial_dim = dims
             fem_specifics.final_time = 1.0;
     end
     fem_specifics.theta = 1.0;
+    fem_specifics.step_number_fom = 2;
 
     params = [1.00, 1.00, 1.00]; 
     
@@ -47,8 +48,8 @@ for spatial_dim = dims
             % initial condition
             u_init = @(x) 0*x(:,1) + 0*x(:,2);
 
-            times = [ 1 5 10 20 40 80 160 320 ]';
-            %times = 25;
+            %times = [ 1 5 10 20 40 80 160 320 ]';
+            times = 25;
             time_steps = fem_specifics.final_time ./ times;
             
         case 2
@@ -75,14 +76,13 @@ for spatial_dim = dims
     
     [~, fespace] = set_fem_simulation( fem_specifics, bc_flags );
 
-     T = fem_specifics.final_time;
+    T = fem_specifics.final_time;
 
-    
     % computation of the exact solution
     switch caso
         case 1
-            
-             [t_exact, exact_sol] = compute_exact_sol(params, fem_specifics, bc_flags, dirichlet_functions, neumann_functions, f_s, f_t, u_init);
+            timestep_number = "all";
+            exact_sol = compute_exact_sol(params, fem_specifics, bc_flags, dirichlet_functions, neumann_functions, f_s, f_t, u_init);
             
         case 2
             
@@ -105,8 +105,8 @@ for spatial_dim = dims
         
         switch caso
             case 1
-                err_L2(count,count_dims) = compute_norm(fespace,sol.u(:,end) - exact_sol(end,:)','L2');
-                err_H1(count,count_dims) = compute_norm(fespace,sol.u(:,end) - exact_sol(end,:)','H1');
+                err_L2(count,count_dims) = compute_norm(fespace,sol.u(:,end) - exact_sol.exact_sol(end,:)','L2');
+                err_H1(count,count_dims) = compute_norm(fespace,sol.u(:,end) - exact_sol.exact_sol(end,:)','H1');
                 
             case 2
                 
@@ -160,8 +160,8 @@ switch caso
         
         figure(3)
         subplot(1,2,1)
-        for i=1:10:length(t_exact)
-            plot3(x,y,exact_sol(i,:));
+        for i=1:10:length(exact_sol.t_exact)
+            plot3(x,y,exact_sol.exact_sol(i,:));
             grid on
             title('Reference solution');
             zlim([0;0.2]);

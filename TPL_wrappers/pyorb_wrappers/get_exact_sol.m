@@ -8,7 +8,7 @@ function [sol] = get_exact_sol( params, fem_specifics, timestep_number, varargin
 %           mesh, the fespace and the time marching scheme
 %           timestep_number: number of initial timesteps where the exact
 %           solution has to be evaluated
-%           varargin: test case number (optional)
+%           varargin: number of time instances and test case number (optional)
 % output=
 %           sol: struct containing the exact solution at the desired
 %           timesteps and the timesteps themselves
@@ -17,11 +17,14 @@ function [sol] = get_exact_sol( params, fem_specifics, timestep_number, varargin
 
 if isfield(fem_specifics, 'final_time') && strcmp(fem_specifics.model, 'thermal_block')
 
-    if nargin > 2
-            caso = varargin{1};
+    if nargin > 3
+            caso = varargin{2};
         else
             caso = 1;
     end
+    
+    if nargin >= 2
+        fem_specifics.number_of_time_instances = cast(varargin{1}, 'double');
     
     timestep_number = cast(timestep_number, 'double');
 

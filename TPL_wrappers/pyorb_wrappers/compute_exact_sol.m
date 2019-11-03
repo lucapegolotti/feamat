@@ -1,4 +1,4 @@
-function [sol] = compute_exact_sol( param, fem_specifics, bc_flags, dirichlet_functions, neumann_functions, f_s, f_t, u_init, timestep_number )
+function [reference_sol] = compute_exact_sol( param, fem_specifics, bc_flags, dirichlet_functions, neumann_functions, f_s, f_t, u_init, timestep_number )
 % Computing the "exact" solution of the problem using ode23t
 % input=
 %           param: vector of parameters
@@ -19,14 +19,14 @@ function [sol] = compute_exact_sol( param, fem_specifics, bc_flags, dirichlet_fu
 
     [~, fespace] = set_fem_simulation( fem_specifics, bc_flags );
     
-    if timestep_number ~= "all"
+    if timestep_number ~= -999.0
         T =  cast((fem_specifics.final_time / ...
                         fem_specifics.number_of_time_instances) * timestep_number, 'double');
          % divinding the reference timestep into 10-times smaller timesteps to
          % gain accuracy
          dt = T / (10*timestep_number);
     else
-        T = fem_specifics.final_time;
+        T = cast(fem_specifics.final_time, 'double');
         dt = T / 1000;
     end
 
@@ -80,8 +80,13 @@ function [sol] = compute_exact_sol( param, fem_specifics, bc_flags, dirichlet_fu
     exact_sol = exact_sol';
     
     % extraction of the timesteps of interest
-    sol.t_exact = tt(11:10:end);
-    sol.u_exact = exact_sol(:,11:10:end);
+    if timestep_number ~= -999
+        reference_sol.t_exact = tt(11:10:end);
+        reference_sol.u_exact = exact_sol(:,11:10:end);
+    else
+        reference_sol.t_exact = tt;
+        reference_sol.u_exact = exact_sol;
+    end
     
 end   
     

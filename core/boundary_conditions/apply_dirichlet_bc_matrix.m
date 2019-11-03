@@ -11,5 +11,5 @@ function [A] = apply_dirichlet_bc_matrix(A,fespace,diagvalue)
 %           A: diagonalized matrix
 
 indices_to_diagonalize = find_dirichlet_indices(fespace);
-A = apply_dirichlet_bc_matrix_indices(A,diagvalue,indices_to_diagonalize);
+A = apply_dirichlet_bc_matrix_indices(A, diagvalue, indices_to_diagonalize);
 

@@ -10,7 +10,7 @@ function [A] = apply_dirichlet_bc_matrix_indices(A,diagvalue,indices_to_diagonal
 
 n_indices = length(indices_to_diagonalize);
 
-A(indices_to_diagonalize,:) = 0;
+A(indices_to_diagonalize, :) = 0;
 
 if (diagvalue ~= 0)
     A(indices_to_diagonalize,indices_to_diagonalize) = ...

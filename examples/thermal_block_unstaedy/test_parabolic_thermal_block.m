@@ -4,7 +4,7 @@ clc
 
 %% Convergence test
 
-dims = [50, 100]; % choose the dimension of the FE space
+dims = [30]; % choose the dimension of the FE space
 N_dims = length(dims);
 
 % choose between case 1 (reference solution computed via ode23t) and case 2
@@ -28,9 +28,9 @@ for spatial_dim = dims
             fem_specifics.final_time = 1.0;
     end
     fem_specifics.theta = 1.0;
-    fem_specifics.step_number_fom = 2;
+    fem_specifics.step_number_fom = 1;
 
-    params = [1.00, 1.00, 1.00]; 
+    params = [1.0, 0.1, 0.76]; 
     
     switch caso
         case 1
@@ -49,7 +49,7 @@ for spatial_dim = dims
             u_init = @(x) 0*x(:,1) + 0*x(:,2);
 
             %times = [ 1 5 10 20 40 80 160 320 ]';
-            times = 25;
+            times =2000;
             time_steps = fem_specifics.final_time ./ times;
             
         case 2
@@ -67,7 +67,6 @@ for spatial_dim = dims
             % initial condition
             u_init = @(x) (x(:,1)-x(:,1).^2).*(x(:,2)-x(:,2).^2);
 
-
             times = [ 1 2 4 8 16 32 54 128 ]';
             %times = 25;
             time_steps = fem_specifics.final_time ./ times;
@@ -81,13 +80,15 @@ for spatial_dim = dims
     % computation of the exact solution
     switch caso
         case 1
-            timestep_number = "all";
-            exact_sol = compute_exact_sol(params, fem_specifics, bc_flags, dirichlet_functions, neumann_functions, f_s, f_t, u_init);
+            timestep_number = -999; % symbolic value to get the reference solution at all timesteps
+            exact_sol = compute_exact_sol(params, fem_specifics, bc_flags, ...
+                               dirichlet_functions, neumann_functions, f_s, f_t, u_init, timestep_number);
             
         case 2
             
             exact_sol = @(x) exp(-T) * (x(1)-x(1).^2).*(x(2)-x(2).^2);
-            grad_exact_sol = @(x) [exp(-T) * (1-2*x(1)).*(x(2)-x(2).^2); exp(-T) * (1-2*x(2)).*(x(1)-x(1).^2)];
+            grad_exact_sol = @(x) [exp(-T) * (1-2*x(1)).*(x(2)-x(2).^2); ...
+                                                 exp(-T) * (1-2*x(2)).*(x(1)-x(1).^2)];
           
     end
     
@@ -105,8 +106,10 @@ for spatial_dim = dims
         
         switch caso
             case 1
-                err_L2(count,count_dims) = compute_norm(fespace,sol.u(:,end) - exact_sol.exact_sol(end,:)','L2');
-                err_H1(count,count_dims) = compute_norm(fespace,sol.u(:,end) - exact_sol.exact_sol(end,:)','H1');
+                err_L2(count,count_dims) = compute_norm(fespace,sol.u(:, end) - ...
+                                                            exact_sol.u_exact(:, end), 'L2');
+                err_H1(count,count_dims) = compute_norm(fespace,sol.u(:, end) - ...
+                                                            exact_sol.u_exact(:,end), 'H1');
                 
             case 2
                 
@@ -161,7 +164,7 @@ switch caso
         figure(3)
         subplot(1,2,1)
         for i=1:10:length(exact_sol.t_exact)
-            plot3(x,y,exact_sol.exact_sol(i,:));
+            plot3(x,y,exact_sol.u_exact(:,i));
             grid on
             title('Reference solution');
             zlim([0;0.2]);
@@ -182,7 +185,7 @@ switch caso
             title('Reference solution');
             zlim([0;0.06]);
             set(gcf, 'Units', 'Normalized', 'OuterPosition', [0.25, 0.3, 0.75, 0.6]);
-            pause(0.0001)
+            pause(0.00001)
         end
         
 end
@@ -202,7 +205,7 @@ switch caso
             title('Numerical solution');
             zlim([0;0.2]);
             set(gcf, 'Units', 'Normalized', 'OuterPosition', [0.25, 0.3, 0.75, 0.6]);
-            pause(0.001)
+            pause(0.00001)
         end
         
     case 2
@@ -215,7 +218,7 @@ switch caso
             title('Numerical solution');
             zlim([0;0.06]);
             set(gcf, 'Units', 'Normalized', 'OuterPosition', [0.25, 0.3, 0.75, 0.6]);
-            pause(0.001)
+            pause(0.00001)
         end
         
 end

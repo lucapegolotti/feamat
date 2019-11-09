@@ -4,7 +4,7 @@ clc
 
 %% Convergence test
 
-dims = [30]; % choose the dimension of the FE space
+dims = [50]; % choose the dimension of the FE space
 N_dims = length(dims);
 
 % choose between case 1 (reference solution computed via ode23t) and case 2
@@ -28,9 +28,10 @@ for spatial_dim = dims
             fem_specifics.final_time = 1.0;
     end
     fem_specifics.theta = 1.0;
-    fem_specifics.step_number_fom = 1;
+    fem_specifics.step_number_fom = 2;
+    fem_specifics.method = 'AM';
 
-    params = [1.0, 0.1, 0.76]; 
+    params = [10.0, 0.13, 7.6]; 
     
     switch caso
         case 1
@@ -49,7 +50,7 @@ for spatial_dim = dims
             u_init = @(x) 0*x(:,1) + 0*x(:,2);
 
             %times = [ 1 5 10 20 40 80 160 320 ]';
-            times =2000;
+            times =50;
             time_steps = fem_specifics.final_time ./ times;
             
         case 2

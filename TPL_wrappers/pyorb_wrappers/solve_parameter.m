@@ -54,7 +54,6 @@ function [sol] = solve_parameter( param, fem_specifics, varargin )
             [ A, ~ ] = assembler_poisson( fespace, f, mu, dirichlet_functions, neumann_functions );
         else
             [ A, b ] = assembler_poisson( fespace, f, mu, dirichlet_functions, neumann_functions );
-            uL = b * 0.0;
         end
 
         u  = A \ b;

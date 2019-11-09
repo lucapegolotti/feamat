@@ -28,6 +28,15 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
     T = cast(fem_specifics.final_time, 'double');
     Theta = fem_specifics.theta; % parameter of theta-method in [0,1]
     step_number = cast(fem_specifics.step_number_fom, 'double'); %number of steps in multistep implementation
+    if step_number > 1
+        update_method = fem_specifics.method;
+    else
+        if strcmp(fem_specifics.method, 'AM') || strcmp(fem_specifics.method, 'BDF')
+            disp(['The ', fem_specifics.method,  ' method with 1 step is analogous to a Theta method with Theta=1']);
+            Theta = 1;
+        end
+        update_method = 'Theta';
+    end
     
     % computation of the time step
     dt = cast(T / n_time_instances, 'double');
@@ -76,9 +85,9 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
     
     % getting the lhs multiplicative coefficient
     if step_number == 1
-        coeffs = get_multistep_coefficients(step_number, Theta);
+        coeffs = get_multistep_coefficients(step_number, update_method, Theta);
     else
-        coeffs = get_multistep_coefficients(step_number);
+        coeffs = get_multistep_coefficients(step_number, update_method);
     end
     
     % assembling of the lhs matrix, considering bc
@@ -119,15 +128,23 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
      if (step_number > 1) || ((step_number == 1) && (coeffs(end) > 0))
          rhs_mat = zeros(fem_dimension, step_number);
          for step = 1:step_number
-             rhs_mat(:, step) = (A_no_bc + M_no_bc) * u(:, step);
+             if strcmp(update_method, 'AM') || strcmp(update_method, 'Theta')
+                rhs_mat(:, step) = (A_no_bc + M_no_bc) * u(:, step);
+             elseif strcmp(update_method, 'BDF')
+                 rhs_mat(:,step) = M_no_bc_time * u(:,step);
+             else
+                disp('ERROR: unrecognized multistep time marching scheme')
+            end
          end
      end
  
     % evaluation of the time part of the force at the needed initial time
     % instants 
-    f0 = zeros(step_number, 1);
-    for step = 1:step_number
-        f0(step) = f_t(t+(step_number-1)*dt);
+    if strcmp(update_method, 'AM') || strcmp(update_method, 'Theta')
+        f0 = zeros(step_number, 1);
+        for step = 1:step_number
+            f0(step) = f_t(t+(step_number-1)*dt);
+        end
     end
          
     % starting time loop
@@ -139,20 +156,31 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
         
         % multiplication of the time forces with the rhs, without considering
         % bc imposition  
-        F = zeros(length(fespace.nodes(:,1)), step_number+1);
-        for step = 1:step_number
-            F(:,step) = f0(step) * b_no_bc;
+        if strcmp(update_method, 'AM') || strcmp(update_method, 'Theta')
+            F = zeros(length(fespace.nodes(:,1)), step_number+1);
+            for step = 1:step_number
+                F(:,step) = f0(step) * b_no_bc;
+            end
+            F(:,end) = f1 * b_no_bc;
+        elseif strcmp(update_method, 'BDF')
+            F = f1*b_no_bc;
         end
-        F(:,end) = f1 * b_no_bc;
 
         % assembling of the rhs vector, without considering bc
-       RHS =  M_no_bc_time * u(:, count);
-       for step = 1:step_number+1
-           RHS = RHS + coeffs(step) * dt * F(:, end-step+1);
-            if step > 1 && coeffs(step) > 0
-                RHS = RHS - coeffs(step) * dt * rhs_mat(:, end-step+2);
-            end
-       end      
+       if strcmp(update_method, 'AM') || strcmp(update_method, 'Theta')
+           RHS =  M_no_bc_time * u(:, count);
+           for step = 1:step_number+1
+               RHS = RHS + coeffs(step) * dt * F(:, end-step+1);
+                if step > 1 && coeffs(step) > 0
+                    RHS = RHS - coeffs(step) * dt * rhs_mat(:, end-step+2);
+                end
+           end 
+       elseif strcmp(update_method, 'BDF')
+           RHS = coeffs(1) * dt * F;
+           for step = 1:step_number
+               RHS = RHS - coeffs(end-step+1) * rhs_mat(:,step);
+           end
+       end
         
         % imposition of bc in classical way rhs
         if (thereisneumann)
@@ -167,14 +195,21 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
 
         u(:,count+1) = apply_dirichlet_bc_rhs(u(:,count+1), fespace, dirichlet_functions);
 
-        % update the time part of the force and the counter  
+        % update the time part of the force, the rhs matrix and the counter  
         if step_number >= 2
-            f0(1:end-1) = f0(2:end);
+            if strcmp(update_method, 'AM') 
+                f0(1:end-1) = f0(2:end);
+            end
             rhs_mat(:, 1:end-1) = rhs_mat(:, 2:end);
         end
-        f0(end) = f1;
-        if (step_number>1) || (step_number==1 && coeffs(end)>0)
-            rhs_mat(:, end) = (A_no_bc + M_no_bc) * u(:, count+1);
+        
+        if strcmp(update_method, 'AM') || strcmp(update_method, 'Theta')
+            f0(end) = f1;
+            if (step_number>1) || (step_number==1 && coeffs(end)>0)
+                rhs_mat(:, end) = (A_no_bc + M_no_bc) * u(:, count+1);
+            end
+        elseif strcmp(update_method, 'BDF')
+            rhs_mat(:,end) = M_no_bc_time * u(:, count+1);
         end
         count = count + 1;
         

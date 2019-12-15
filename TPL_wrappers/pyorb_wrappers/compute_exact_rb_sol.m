@@ -1,4 +1,6 @@
-function [reference_sol] = compute_exact_sol( param, fem_specifics, bc_flags, dirichlet_functions, neumann_functions, f_s, f_t, u_init, timestep_number )
+function [reference_sol] = compute_exact_rb_sol(param, fem_specifics, bc_flags, dirichlet_functions,...
+                                                                            neumann_functions, f_s, f_t, u_init, timestep_number,...
+                                                                            rb_basis)
 % Computing the "exact" solution of the problem using ode23t
 % input=
 %           param: vector of parameters
@@ -12,6 +14,7 @@ function [reference_sol] = compute_exact_sol( param, fem_specifics, bc_flags, di
 %           u_init: initial condition
 %           timestep_number: number of timesteps at which the exact
 %           solution has to be computed
+%           rb_basis: basis from the RB method
 % output=
 %           sol: struct containing the computed solution at the desired
 %           timesteps and the timesteps themselves
@@ -65,6 +68,13 @@ function [reference_sol] = compute_exact_sol( param, fem_specifics, bc_flags, di
     % evaluation of the initial condition
     y0 = u_init(fespace.nodes(:,1:2));  
     
+    % evaluating the reduced version of all matrices/vectors
+    A = rb_basis' * A *rb_basis;
+    M = rb_basis' * M *rb_basis;
+    M_time = rb_basis' * M_time *rb_basis;
+    b = rb_basis' * b;
+    y0 = rb_basis' * y0;
+    
     % definition of the time interval 
     tspan = 0:dt:T;
     
@@ -73,7 +83,7 @@ function [reference_sol] = compute_exact_sol( param, fem_specifics, bc_flags, di
     
     % adjust rhs vector to take care of the time dependent part of the
     % forcing term
-    %b_adj = adjust_rhs(b, f_t, fespace);
+    % b_adj = adjust_rhs(b, f_t, fespace);
     
     % resolution
     [tt, exact_sol] = ode23t(@(t,u) -(A+M)*u + b*f_t(t), tspan, y0, opts);

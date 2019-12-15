@@ -27,4 +27,4 @@ fem_specifics.theta = 1.0;
 timestep_number = 4;
 test_nb = 1;
 
-sol = get_exact_sol(params, fem_specifics, timestep_number, caso);
+sol = get_reference_sol(params, fem_specifics, timestep_number, caso);

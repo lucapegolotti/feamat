@@ -28,10 +28,10 @@ for spatial_dim = dims
             fem_specifics.final_time = 1.0;
     end
     fem_specifics.theta = 1.0;
-    fem_specifics.step_number_fom = 2;
-    fem_specifics.method = 'AM';
+    fem_specifics.step_number_fom = 4;
+    fem_specifics.method = 'BDF';
 
-    params = [10.0, 0.13, 7.6]; 
+    params = [9.12, 0.13, 7.6]; 
     
     switch caso
         case 1

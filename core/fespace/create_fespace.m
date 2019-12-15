@@ -18,14 +18,14 @@ fespace.degree = polydegree;
 % they are enforced on the assembled matrix of the system
 fespace.bc = bc_flags;
 
-if (polydegree == 'P1')
+if (strcmp(polydegree, 'P1'))
     fespace.nodes = mesh.vertices;
     fespace.connectivity = mesh.elements;
     fespace.mesh = mesh;
     fespace.n_functions_per_element = 3;
     fespace.functions = @(x) [1-x(1)-x(2);x(1);x(2)];
     fespace.grads = @(x) [-1 -1; 1 0; 0 1]';
-elseif (polydegree == 'P2')
+elseif (strcmp(polydegree, 'P2'))
     n_elements = size(mesh.elements,1);
     n_vertices = size(mesh.vertices,1);
     aux = sparse(n_vertices,n_vertices);
@@ -72,7 +72,7 @@ elseif (polydegree == 'P2')
         4*x(2) 4*x(1); ...
         -4*x(2) -8*x(2)-4*x(1)+4 ]';
     
-elseif (polydegree == 'P3')
+elseif (strcmp(polydegree, 'P3'))
     n_elements = size(mesh.elements,1);
     n_vertices = size(mesh.vertices,1);
     aux = sparse(n_vertices,n_vertices);

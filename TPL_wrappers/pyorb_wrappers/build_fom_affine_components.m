@@ -58,6 +58,7 @@ function [array] = build_fom_affine_components( operator, fem_specifics )
     end
     
     if operator == 'f'
+        
         mu = @(x) 1.0 * (x(1,:)>=0.5).*(x(1,:)<1.0).*(x(2,:)>=0.5).*(x(2,:)<1.0) ;
         [ ~, b ] = assembler_poisson( fespace,f,mu,dirichlet_functions,neumann_functions );
         array.f0 = b;

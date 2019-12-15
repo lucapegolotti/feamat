@@ -1,4 +1,4 @@
-function [sol] = get_exact_sol( params, fem_specifics, timestep_number, varargin)
+function [sol] = get_exact_rb_sol( params, fem_specifics, rb_basis, timestep_number, varargin)
 % Get the "exact" solution of the problem, via ode23t. Available only for
 % thermal block unsteady problem, over the specific test cases that have
 % been considered in pyorb
@@ -6,6 +6,7 @@ function [sol] = get_exact_sol( params, fem_specifics, timestep_number, varargin
 %           param: vector of parameters
 %           fem_specifics: struct containing the information to build the
 %           mesh, the fespace and the time marching scheme
+%           rb_basis: basis matrix for RB method
 %           timestep_number: number of initial timesteps where the exact
 %           solution has to be evaluated
 %           varargin: number of time instances and test case number (optional)
@@ -17,13 +18,13 @@ function [sol] = get_exact_sol( params, fem_specifics, timestep_number, varargin
 
 if isfield(fem_specifics, 'final_time') && strcmp(fem_specifics.model, 'thermal_block')
 
-    if nargin > 4
+    if nargin > 3
             caso = varargin{2};
     else
             caso = 1;
     end
     
-    if nargin > 3
+    if nargin >= 2
         fem_specifics.number_of_time_instances = cast(varargin{1}, 'double');
     end
     
@@ -62,7 +63,8 @@ if isfield(fem_specifics, 'final_time') && strcmp(fem_specifics.model, 'thermal_
     end
 
    %computation of the exact solution
-   sol = compute_exact_sol(params, fem_specifics, bc_flags, dirichlet_functions, neumann_functions, f_s, f_t, u_init, timestep_number);
+   sol = compute_exact_rb_sol(params, fem_specifics, bc_flags, dirichlet_functions,...
+                                               neumann_functions, f_s, f_t, u_init, timestep_number, rb_basis);
     
 else
     

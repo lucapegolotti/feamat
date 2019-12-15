@@ -1,4 +1,4 @@
-function b_adj = adjust_rhs(b,f_t,fespace)
+function b_adj = adjust_rhs(b, f_t, fespace)
 % Function to adjust the rhs vector of the parabolic problem, in order to
 % take into account the presence of the time dependent part of the forcing
 % term
@@ -18,7 +18,7 @@ nodes = fespace.nodes;
 
 for i = 1:n_nodes
     if (nodes(i,3)~=0)
-        b_adj= @(t) b / f_t(t);
+        b_adj = @(t) b / f_t(t);
     end
 end
 

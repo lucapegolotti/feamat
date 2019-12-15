@@ -34,29 +34,32 @@ function [array] = build_fom_affine_components_unsteady( operator, fem_specifics
         % forcing term
         if  (strcmp(considered_model, 'thermal_block')==1)
             if nargin <= 4 || (nargin == 4 && varargin{2}==1)
-                f = @(x,t) 1 * exp(-t.^2) + 0.*x(1,:);
+                %f = @(x,t) 1 * exp(-t.^2) + 0.*x(1,:);
+                f_space = @(x) 1 + 0.*x(1,:) + 0.*x(2,:);
+                f_time = @(t) exp(-t.^2) ;
+                f = @(x,t) f_space(x) .* f_time(t);
             elseif nargin==4 && varargin{2}==2
-                f = @(x,t) 1*exp(-t) + 0*x(1,:);
+                %f = @(x,t) 1*exp(-t) + 0*x(1,:);
+                f_space = @(x) 1 + 0.*x(1,:) + 0.*x(2,:);
+                f_time = @(t) exp(-t) ;
+                f = @(x,t) f_space(x) .* f_time(t);
             else
-                f = @(x,t) 0*x(1,:) + 0*t; 
+                %f = @(x,t) 0*x(1,:) + 0*t; 
+                f_space = @(x) 1 + 0.*x(1,:) + 0.*x(2,:);
+                f_time = @(t) 0.*t;
+                f = @(x,t) f_space(x) .* f_time(t);
             end
         else
-            f = @(x) 0*x(1,:); 
+             f_space = @(x) 1 + 0.*x(1,:) + 0.*x(2,:);
+             f_time = @(t) 0.*t;
+             f = @(x,t) f_space(x) .* f_time(t);
         end
 
-        current_model = fem_specifics.model;
-
-        if strcmp( current_model, 'nonaffine' )
-            f = @(x) 0*x(1,:) + 1;
-            dirichlet_functions = @(x) [0;0;0;0];
-            neumann_functions   = @(x) [0;0;0;0];
-        end
-
-        if operator == 'A'
-            temp_f = @(x) f(x,0);
+        if strcmp(operator, 'A')
+            %temp_f = @(x) f(x,0);
 
             mu = @(x) (x(1,:)<0.5).*(x(2,:)<0.5);
-            [ A, ~ ] = assembler_poisson( fespace,temp_f,mu,dirichlet_functions,neumann_functions );
+            [ A, ~ ] = assembler_poisson( fespace,f_space,mu,dirichlet_functions,neumann_functions );
             [i,j,val] = find( A );
             array.A0 = [i,j,val];        
 
@@ -77,14 +80,14 @@ function [array] = build_fom_affine_components_unsteady( operator, fem_specifics
         end
         
 
-        if operator == 'M'
+        if strcmp(operator, 'M')
             M = assemble_mass(fespace);
             [i,j,val] = find( M );
             array.M0 = [i,j,val];
         end
         
 
-        if operator == 'f'
+        if strcmp(operator, 'f')
 
             dim = (fem_specifics.number_of_elements+1)^2;
                
@@ -97,7 +100,7 @@ function [array] = build_fom_affine_components_unsteady( operator, fem_specifics
             end
 
             index = 0;
-            for time = dt:dt:fem_specifics.final_time
+            for time = 0:dt:fem_specifics.final_time
 
                 temp_f = @(x) f(x,time);
 
@@ -113,6 +116,14 @@ function [array] = build_fom_affine_components_unsteady( operator, fem_specifics
 
         end
         
+        if strcmp(operator, 'f_space')
+            
+            mu = @(x) 1.0 * (x(1,:)>=0.5).*(x(1,:)<1.0).*(x(2,:)>=0.5).*(x(2,:)<1.0) ;
+             [ ~, b ] = assembler_poisson( fespace,f_space,mu,dirichlet_functions,neumann_functions );
+             array.f_space0 = b;
+             
+        end
+                 
     end
         
 end

@@ -15,6 +15,6 @@ indices = [];
 for i = 1:n_nodes
     if (nodes(i,3)~=0 && bc_flags(nodes(i,3)) || ...
         nodes(i,4) ~= 0 && bc_flags(nodes(i,4)))
-        indices = [indices;i];
+        indices = [indices; i];
     end
 end

@@ -163,7 +163,7 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
             end
             F(:,end) = f1 * b_no_bc;
         elseif strcmp(update_method, 'BDF')
-            F = f1*b_no_bc;
+            F = f1 * b_no_bc;
         end
 
         % assembling of the rhs vector, without considering bc

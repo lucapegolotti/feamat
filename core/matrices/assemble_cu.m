@@ -24,7 +24,7 @@ n_functions = fespace.n_functions_per_element;
 n_functionsqr = n_functions^2;
 
 % number of gauss points
-n_gauss = 3;
+n_gauss = 6;
 
 elements_M = zeros(n_functions*n_elements,1);
 indices_i = zeros(n_functions*n_elements,1);

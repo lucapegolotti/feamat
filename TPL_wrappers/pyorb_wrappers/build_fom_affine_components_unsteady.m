@@ -26,7 +26,7 @@ function [array] = build_fom_affine_components_unsteady( operator, fem_specifics
             error('This operator for the chosen model is not supported');
         end
 
-        [~, fespace] = set_fem_simulation( fem_specifics,[1;1;0;1] );
+        [~, fespace] = set_fem_simulation( fem_specifics, [1;1;0;1] );
 
         dirichlet_functions = @(x) [0;0;0;0];
         neumann_functions = @(x) [0;0;0;0];

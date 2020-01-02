@@ -27,9 +27,9 @@ if (length(find(bc_flags)) == length(bc_flags))
 end
 
 if use_full_element_list
-    A = assemble_stiffness( mu, fespace );
+    A = assemble_stiffness(mu, fespace );
 else
-    A = assemble_stiffness_elementlist( mu, fespace, element_list );
+    A = assemble_stiffness_elementlist(mu, fespace, element_list );
 end
 
 b = assemble_rhs(fespace,fun);

@@ -1,4 +1,4 @@
-function [h]= plot_fe_function(vec,fespace,varargin)
+function [h]= plot_fe_function(vec, fespace, varargin)
 % Plot finite element function as a surface (note: only value at vertices 
 % of triangles are used for the visualization)
 %

@@ -30,7 +30,6 @@ elements_A = zeros(n_functions*n_elements,1);
 indices_i = zeros(n_functions*n_elements,1);
 indices_j = zeros(n_functions*n_elements,1);
 
-
 if (~strcmp(fespace.mesh.type,'structured'))
     
     [gp,weights,~] = gauss_points2D(n_gauss);
@@ -126,7 +125,7 @@ else
         for i = 1:n_elements
             indices = connectivity(i,1:end-1);
             
-            [I1,I2] = meshgrid(indices,indices);
+            [I1,I2] = meshgrid(indices, indices);
             currindices = (i-1)*n_functionsqr+1:n_functionsqr*i;
             indices_i(currindices) = I1(:);
             indices_j(currindices) = I2(:);
@@ -139,7 +138,7 @@ else
             end
             elements_A(currindices) = new_elements;
         end
-        elements_A = elements_A*mu;
+        %elements_A = elements_A.*mu;
     end
 end
 

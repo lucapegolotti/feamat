@@ -4,13 +4,15 @@ function [] = plot_fe_solution(rb_solution, fe_solution, fem_specifics, folder, 
 %           rb_solution vector containing the RB solution to the problem at
 %           hand
 %           fe_solution: vector containing the FE solution to the problem at
-%           hand. If 0, just the RB solution is plotted
+%           hand. If empty vector or double, just the RB solution is plotted
 %           fem_specifics: struct containing the information to build the
 %           mesh, the fespace and the time marching scheme
 %           folder: folder where to save the plot
 %           name: name of the plot
 %           varargin: name of the test case, if specified. Else it is set
 %           to 1
+
+% dbstop at 32
 
 if nargin > 3
         caso = varargin{1};
@@ -27,8 +29,8 @@ end
 
 [~, fespace] = set_fem_simulation(fem_specifics, bc_flags);
 
-figure();
-if fe_solution ~= 0
+fig = figure();
+if ~isempty(fe_solution)
     for i = 1:2
         subplot(1,2,i)
         if i == 1
@@ -41,13 +43,13 @@ if fe_solution ~= 0
     end
 else
    plot_fe_function(rb_solution, fespace);
-   title('Solution Plot') 
+   title('Error Plot') 
 end
 
 folder= convertCharsToStrings(folder);
 name = convertCharsToStrings(name);
              
-%saveas(fig, folder+name, 'eps')
-savefig(folder+name+'.fig')
+saveas(fig, folder+name, 'epsc')
+%savefig(folder+name+'.fig')
 
 end

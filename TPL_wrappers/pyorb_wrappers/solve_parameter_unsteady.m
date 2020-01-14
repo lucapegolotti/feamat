@@ -143,7 +143,7 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
     if strcmp(update_method, 'AM') || strcmp(update_method, 'Theta')
         f0 = zeros(step_number, 1);
         for step = 1:step_number
-            f0(step) = f_t(t+(step_number-1)*dt);
+            f0(step) = f_t(t+(step-1)*dt);
         end
     end
          

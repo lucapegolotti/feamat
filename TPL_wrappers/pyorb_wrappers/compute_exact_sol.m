@@ -1,4 +1,5 @@
-function [reference_sol] = compute_exact_sol( param, fem_specifics, bc_flags, dirichlet_functions, neumann_functions, f_s, f_t, u_init, timestep_number )
+function [reference_sol] = compute_exact_sol( param, fem_specifics, bc_flags, dirichlet_functions, ...
+                                                                        neumann_functions, f_s, f_t, u_init, timestep_number )
 % Computing the "exact" solution of the problem using ode23t
 % input=
 %           param: vector of parameters

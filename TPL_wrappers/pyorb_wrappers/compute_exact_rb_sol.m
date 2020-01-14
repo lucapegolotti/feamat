@@ -1,7 +1,8 @@
 function [reference_sol] = compute_exact_rb_sol(param, fem_specifics, bc_flags, dirichlet_functions,...
                                                                             neumann_functions, f_s, f_t, u_init, timestep_number,...
                                                                             rb_basis)
-% Computing the "exact" solution of the problem using ode23t
+% Computing the "exact" solution of the problem using ode23t and rb
+% projected data
 % input=
 %           param: vector of parameters
 %           fem_specifics: struct containing the information to build the

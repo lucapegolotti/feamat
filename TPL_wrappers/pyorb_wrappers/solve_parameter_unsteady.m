@@ -30,6 +30,10 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
     step_number = cast(fem_specifics.step_number_fom, 'double'); %number of steps in multistep implementation
     if step_number > 1
         update_method = fem_specifics.method;
+        if strcmp(update_method, 'Theta')
+            disp(['Setting the step_number from ', num2str(step_number), ' to 1, since Theta method is a 1-step method'])
+            step_number = 1;
+        end
     else
         if strcmp(fem_specifics.method, 'AM') || strcmp(fem_specifics.method, 'BDF')
             disp(['The ', fem_specifics.method,  ' method with 1 step is analogous to a Theta method with Theta=1']);

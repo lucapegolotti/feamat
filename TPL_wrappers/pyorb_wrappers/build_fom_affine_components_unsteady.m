@@ -85,13 +85,13 @@ function [array] = build_fom_affine_components_unsteady( operator, fem_specifics
 
         if strcmp(operator, 'f')
 
-            dim = (fem_specifics.number_of_elements+1)^2;
+            dim = (fem_specifics.number_of_elements+1)^2;  % assuming P1!!
                
             if nargin == 2
-                b = zeros(dim * fem_specifics.number_of_time_instances, 1);
+                b = zeros(dim * (fem_specifics.number_of_time_instances+1), 1);
                 dt = fem_specifics.final_time / fem_specifics.number_of_time_instances;
             else
-                b = zeros(dim * varargin{1}, 1);
+                b = zeros(dim * (varargin{1}+1), 1);
                 dt = fem_specifics.final_time / varargin{1};
             end
 

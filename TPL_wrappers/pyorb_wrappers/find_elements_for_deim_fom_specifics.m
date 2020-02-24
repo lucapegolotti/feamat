@@ -1,5 +1,5 @@
 function elements = find_elements_for_deim_fom_specifics( fem_specifics, indices )
-% Wrapper for extracting the list of mesh elements contributing to
+% Wrapper to extract the list of mesh elements contributing to
 % populating the given indices of the RHS, used in DEIM
 % framework
 % input=

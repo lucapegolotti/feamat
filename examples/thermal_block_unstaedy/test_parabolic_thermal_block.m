@@ -28,10 +28,10 @@ for spatial_dim = dims
             fem_specifics.final_time = 1.0;
     end
     fem_specifics.theta = 1.0;
-    fem_specifics.step_number_fom = 4;
+    fem_specifics.step_number_fom = 3;
     fem_specifics.method = 'BDF';
 
-    params = [9.12, 0.13, 7.6]; 
+    params = [7.10, 4.50, 0.90]; 
     
     switch caso
         case 1
@@ -50,7 +50,7 @@ for spatial_dim = dims
             u_init = @(x) 0*x(:,1) + 0*x(:,2);
 
             %times = [ 1 5 10 20 40 80 160 320 ]';
-            times =50;
+            times =500;
             time_steps = fem_specifics.final_time ./ times;
             
         case 2
@@ -68,8 +68,8 @@ for spatial_dim = dims
             % initial condition
             u_init = @(x) (x(:,1)-x(:,1).^2).*(x(:,2)-x(:,2).^2);
 
-            times = [ 1 2 4 8 16 32 54 128 ]';
-            %times = 25;
+            % times = [ 1 2 4 8 16 32 54 128 ]';
+            times = 100;
             time_steps = fem_specifics.final_time ./ times;
             
     end

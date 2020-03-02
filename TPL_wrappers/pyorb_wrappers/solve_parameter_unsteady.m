@@ -36,8 +36,12 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
         end
     else
         if strcmp(fem_specifics.method, 'AM') || strcmp(fem_specifics.method, 'BDF')
-            disp(['The ', fem_specifics.method,  ' method with 1 step is analogous to a Theta method with Theta=1']);
-            Theta = 1;
+            if strcmp(fem_specifics.method, 'AM')
+                Theta = 0.5;
+            elseif strcmp(fem_specifics.metjod, 'BDF')
+                Theta = 1;
+            end
+            disp(['The ', fem_specifics.method,  ' method with 1 step is analogous to a Theta method with Theta=', Theta]);
         end
         update_method = 'Theta';
     end
@@ -218,7 +222,7 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
         count = count + 1;
         
     end
- 
+    
     sol.u = u;
 
 end

@@ -7,7 +7,7 @@ clc
 dims = [50]; % choose the dimension of the FE space
 N_dims = length(dims);
 
-% choose between case 1 (reference solution computed via ode23t) and case 2
+% choose between case 1 (reference solution computed via ode15s) and case 2
 % (reference solution computed from an analytical expression)
 caso = 1; 
 
@@ -28,10 +28,10 @@ for spatial_dim = dims
             fem_specifics.final_time = 1.0;
     end
     fem_specifics.theta = 1.0;
-    fem_specifics.step_number_fom = 3;
+    fem_specifics.step_number_fom = 4;
     fem_specifics.method = 'BDF';
 
-    params = [7.10, 4.50, 0.90]; 
+    params = [0.10, 0.50, 9.87]; 
     
     switch caso
         case 1
@@ -165,8 +165,7 @@ switch caso
         figure(3)
         subplot(1,2,1)
         for i=1:10:length(exact_sol.t_exact)
-            plot3(x,y,exact_sol.u_exact(:,i));
-            grid on
+            plot_fe_function(exact_sol.u_exact(:,i), fespace);
             title('Reference solution');
             zlim([0;0.2]);
             set(gcf, 'Units', 'Normalized', 'OuterPosition', [0.25, 0.3, 0.75, 0.6]);
@@ -181,8 +180,7 @@ switch caso
         t_exact = linspace(0,T,1000);
         for i=1:length(t_exact)
             exact_sol_t = @(x,y) exact_sol(x,y,t_exact(i));
-            plot3(x,y,exact_sol_t(x,y));
-            grid on
+            plot_fe_function(exact_sol_t(x,y), fespace);
             title('Reference solution');
             zlim([0;0.06]);
             set(gcf, 'Units', 'Normalized', 'OuterPosition', [0.25, 0.3, 0.75, 0.6]);
@@ -201,8 +199,7 @@ switch caso
         figure(3)
         subplot(1,2,2)
         for i=1:fem_specifics.number_of_time_instances
-            plot3(x,y,sol.u(:,i));
-            grid on
+            plot_fe_function(sol.u(:,i), fespace);
             title('Numerical solution');
             zlim([0;0.2]);
             set(gcf, 'Units', 'Normalized', 'OuterPosition', [0.25, 0.3, 0.75, 0.6]);
@@ -214,8 +211,7 @@ switch caso
         figure(3)
         subplot(1,2,2)
         for i=1:fem_specifics.number_of_time_instances
-            plot3(x,y,sol.u(:,i));
-            grid on
+            plot_fe_function(sol.u(:,i), fespace);
             title('Numerical solution');
             zlim([0;0.06]);
             set(gcf, 'Units', 'Normalized', 'OuterPosition', [0.25, 0.3, 0.75, 0.6]);

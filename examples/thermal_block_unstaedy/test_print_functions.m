@@ -15,7 +15,9 @@ fem_specifics.mesh_name = ['cube' num2str(dim) 'x' num2str(dim)];
 % New fields in time dependent case!!!!
 
 fem_specifics.final_time = 0.1;
-fem_specifics.number_of_time_instances = 50.0;
+fem_specifics.number_of_time_instances = 1000.0;
+fem_specifics.method = 'BDF';
+fem_specifics.step_number_fom = 6;
 fem_specifics.theta = 1.0;
 
 bc = [1;1;0;1];
@@ -24,15 +26,15 @@ bc = [1;1;0;1];
 
 %% Importing the RB basis files
  
-basis_space = importdata('/home/tenderin/Desktop/TESTS/Unsteady/thermal_block_test/test_heat_equation_offline_50/basis_space_50_train.txt');
-basis_time = importdata('/home/tenderin/Desktop/TESTS/Unsteady/thermal_block_test/test_heat_equation_offline_50/basis_time_50_train.txt');
+basis_space = importdata('./../TESTS/RB/Unsteady/tbp_multistep/BDF/Test1/data/fem_dim_50_time_dim_1000/pod_tolerance_-5/basis.txt');
+%basis_time = importdata('/home/tenderin/Desktop/TESTS/Unsteady/thermal_block_test/test_heat_equation_offline_50/basis_time_50_train.txt');
 
 
 %% Plotting space basis
 
 figure()
-for i = 1:4
-    subplot(2,2,i)
+for i = 35:39
+    subplot(2,2,i-34)
     h = plot_fe_function(basis_space(:,i),fespace);
     title(['Space Basis Function ', num2str(i)]);
 end

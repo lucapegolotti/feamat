@@ -9,6 +9,8 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
 % output=
 %           sol: struct containing the solution
 
+    tic;
+
     if nargin > 2
         caso = varargin{1};
     else
@@ -126,9 +128,9 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
     
     %evaluation of the initial timesteps, if needed by the multistep method
     if step_number >= 2
-         sol = compute_exact_sol(param, fem_specifics, bc_flags, dirichlet_functions, ...
-                  neumann_functions, f_s, f_t, u_init, step_number-1);
-         u(:, 2:step_number) = sol.u_exact;       
+         exact_sol = compute_exact_sol(param, fem_specifics, bc_flags, dirichlet_functions, ...
+                                                          neumann_functions, f_s, f_t, u_init, step_number-1);
+         u(:, 2:step_number) = exact_sol.u_exact;       
     end
      
      %pre-assembling of the vectors that will be involved in the rhs
@@ -224,6 +226,6 @@ function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
     end
     
     sol.u = u;
-
+    sol.execution_time = toc;
 end
 

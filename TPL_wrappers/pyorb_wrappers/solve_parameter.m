@@ -8,6 +8,8 @@ function [sol] = solve_parameter( param, fem_specifics, varargin )
 % output=
 %           sol: struct containing the solution
 
+    tic;
+
     if (isfield( fem_specifics, 'final_time' ))
         % in this case it means that the problem is unsteady, since more
         % fields (like 'final_time') have been added in such a case!!!
@@ -59,6 +61,7 @@ function [sol] = solve_parameter( param, fem_specifics, varargin )
         u  = A \ b;
 
         sol.u = u;
+        sol.execution_time = toc;
     end
 end
 

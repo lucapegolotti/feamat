@@ -98,11 +98,12 @@ function [array] = build_fom_affine_components_unsteady( operator, fem_specifics
             index = 0;
             for time = 0:dt:fem_specifics.final_time
 
-                temp_f = @(x) f(x,time);
+                %temp_f = @(x) f(x,time);
 
                 mu = @(x) 1.0 * (x(1,:)>=0.5).*(x(1,:)<1.0).*(x(2,:)>=0.5).*(x(2,:)<1.0);
                 [ ~, b(index*dim+1:(index+1)*dim) ] = assembler_poisson(...
-                                                        fespace,temp_f,mu,dirichlet_functions,neumann_functions );
+                                                        fespace,f_space,mu,dirichlet_functions,neumann_functions );
+                b(index*dim+1:(index+1)*dim) = b(index*dim+1:(index+1)*dim) * f_time(time);
 
                 index = index + 1;
 

@@ -25,7 +25,8 @@ function [reference_sol] = compute_exact_sol( param, fem_specifics, bc_flags, di
                         fem_specifics.number_of_time_instances) * timestep_number, 'double');
          % divinding the reference timestep into 10-times smaller timesteps to
          % gain accuracy
-         dt = T / (10*timestep_number);
+         %dt = T / (10*timestep_number);
+         dt = T / timestep_number;
     else
         T = cast(fem_specifics.final_time, 'double');
         dt = T / 1000;
@@ -80,10 +81,17 @@ function [reference_sol] = compute_exact_sol( param, fem_specifics, bc_flags, di
     [tt, exact_sol] = ode23t(@(t,u) -(A+M)*u + b*f_t(t), tspan, y0, opts);
     exact_sol = exact_sol';
     
+     if length(tspan) == 2
+        tt = tt([1,end]);
+        exact_sol = exact_sol(:, [1,end]);
+     end
+    
     % extraction of the timesteps of interest
     if timestep_number ~= -999.0
-        reference_sol.t_exact = tt(11:10:end);
-        reference_sol.u_exact = exact_sol(:, 11:10:end);
+        %reference_sol.t_exact = tt(11:10:end);
+        %reference_sol.u_exact = exact_sol(:, 11:10:end);
+        reference_sol.t_exact = tt(2:end);
+        reference_sol.u_exact = exact_sol(:, 2:end);
     else
         reference_sol.t_exact = tt;
         reference_sol.u_exact = exact_sol;

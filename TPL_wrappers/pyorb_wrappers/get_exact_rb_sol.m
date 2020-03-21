@@ -14,17 +14,16 @@ function [sol] = get_exact_rb_sol( params, fem_specifics, rb_basis, timestep_num
 %           sol: struct containing the exact solution at the desired
 %           timesteps and the timesteps themselves
 
-%dbstop  in compute_exact_sol at 67
 
 if isfield(fem_specifics, 'final_time') && strcmp(fem_specifics.model, 'thermal_block')
 
-    if nargin > 3
+    if nargin > 5
             caso = varargin{2};
     else
             caso = 1;
     end
     
-    if nargin >= 2
+    if nargin >= 4
         fem_specifics.number_of_time_instances = cast(varargin{1}, 'double');
     end
     
@@ -74,6 +73,5 @@ else
     disp("Impossible to compute the exact solution for the selected problem!")
     
 end
-
-           
+       
 end

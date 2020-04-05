@@ -1,11 +1,16 @@
 function [array] = assemble_fom_rhs( param, fem_specifics, varargin )
-% Assemble fom matrix for elliptic scalar problems
+% Assemble FEM approximation of the RHS forcing term, for both steady and
+% unsteady problems. If the RHS is time dependent, it is returned as a 1D
+% vector, where the evaluations at different time instants are placed one
+% after the other. Also, it is possible to evaluate it just at some mesh
+% elements or DOF indices via varagin{1} and varagin{2} respectively.
 % input=
 %           param: vector of parameters
 %           fem_specifics: struct containing the information to build the
 %           mesh and the fespace
 % output=
-%           array: struct containing the stiffness matrix in COO format
+%           array: struct containing the FEM approximatio of the RHS (in
+%           full format)
 
     [~, fespace] = set_fem_simulation( fem_specifics );
 

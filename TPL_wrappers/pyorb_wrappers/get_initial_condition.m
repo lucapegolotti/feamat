@@ -6,9 +6,10 @@ function [u0] = get_initial_condition( param, fem_specifics, varargin)
 %           mesh, the fespace and the time marching scheme
 %           varargin: test case number (optional)
 % output=
-%           u0: initial condition (if the problem is unsteady, NaN otherwise)
+%           u0: array containing the initial condition (if the problem is unsteady, 
+%           NaN otherwise)
 
-if (isfield(fem_specifics, 'final_time'))
+if (isfield(fem_specifics, 'final_time')) && strcmp(fem_specifics.model, 'thermal_block' )
 
     if nargin > 2
             caso = varargin{1};

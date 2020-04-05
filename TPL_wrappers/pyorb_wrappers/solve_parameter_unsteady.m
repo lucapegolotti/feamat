@@ -1,13 +1,13 @@
 function [sol] = solve_parameter_unsteady( param, fem_specifics, varargin )
-%Solve the unsteady fom problem using a suitable multistep time-marching
-%scheme
+%Solve the unsteady FEM problem using a suitable multistep time-marching
+%scheme (either Theta method or AM or BDF)
 % input=
 %           param: vector of parameters
 %           fem_specifics: struct containing the information to build the
 %           mesh, the fespace and the time marching scheme
 %           varargin: test case number (optional)
 % output=
-%           sol: struct containing the solution
+%           sol: struct containing the solution and the execution time
 
     tic;
 

@@ -12,7 +12,6 @@ function [] = plot_fe_solution(rb_solution, fe_solution, fem_specifics, folder, 
 %           varargin: name of the test case, if specified. Else it is set
 %           to 1
 
-% dbstop at 32
 
 if nargin > 3
         caso = varargin{1};
@@ -30,7 +29,8 @@ end
 [~, fespace] = set_fem_simulation(fem_specifics, bc_flags);
 
 fig = figure();
-if ~isempty(fe_solution)
+save_plot = 1;
+if ~isempty(rb_solution) && ~isempty(fe_solution)
     for i = 1:2
         subplot(1,2,i)
         if i == 1
@@ -41,15 +41,20 @@ if ~isempty(fe_solution)
             title('FE Solution Plot')
         end
     end
-else
+elseif ~isempty(rb_solution)
    plot_fe_function(rb_solution, fespace);
    title('Error Plot') 
+elseif ~isempty(fe_solution)
+   plot_fe_function(fe_solution, fespace);
+   title('Error Plot') 
+else
+    save_plot = 0;
 end
 
-folder= convertCharsToStrings(folder);
-name = convertCharsToStrings(name);
-             
-saveas(fig, folder+name, 'epsc')
-%savefig(folder+name+'.fig')
+if save_plot
+    folder= convertCharsToStrings(folder);
+    name = convertCharsToStrings(name);           
+    saveas(fig, folder+name, 'epsc')
+end
 
 end

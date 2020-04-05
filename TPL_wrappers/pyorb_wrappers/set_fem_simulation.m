@@ -1,11 +1,14 @@
 function [mesh, fespace] = set_fem_simulation( fem_specifics, varargin )
-% Assemble fom affine matrix for elliptic scalar problems
+% Assemble the mesh and the FE space, given some input specifics
 % input=
 %           fem_specifics: struct containing the information to build the
-%           mesh, the fespace and the chosen model
+%           mesh and the fespace; in particular it is necessary to know 
+%           the number of DOFs per direction, the degree of the
+%           polynomials, the type of model to be constructed and whether
+%           non-homogrnrous Dirichlet BCs have to be used or not
 % output=
-%           mesh: mesh for the FE problem to be solved in feamat
-%           fespace: fespace for the FE problem to be solved in feamat
+%           mesh: mesh for the FE problem to be solved 
+%           fespace: fespace for the FE problem to be solved 
  
 n_elements_x = fem_specifics.number_of_elements;
 poly_degree  = fem_specifics.polynomial_degree;

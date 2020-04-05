@@ -1,12 +1,12 @@
 function [sol] = solve_parameter( param, fem_specifics, varargin )
-% Assemble fom matrix for elliptic scalar problems
+% Solve the FEM approximation of the steady or unsteady parametrized PDE problem
 % input=
 %           param: vector of parameters
 %           fem_specifics: struct containing the information to build the
 %           mesh and the fespace
 %           varargin: test case number (optional)
 % output=
-%           sol: struct containing the solution
+%           sol: struct containing the solution and the execution time
 
     tic;
 
@@ -35,7 +35,8 @@ function [sol] = solve_parameter( param, fem_specifics, varargin )
 
         if strcmp( current_model, 'nonaffine_thermal_block' )
            f = @(x) ( 1. / param(6) ) ... 
-               * exp( - ( ( x(1,:)-param(4) ) .* ( x(1,:)-param(4) ) + ( x(2,:)-param(5) ) .* ( x(2,:)-param(5) ) ) / param(6) );
+               * exp( - ( ( x(1,:)-param(4) ) .* ( x(1,:)-param(4) ) + ( x(2,:)-param(5) ) ...
+               .* ( x(2,:)-param(5) ) ) / param(6) );
         end
 
         mu = build_diffusion( param, current_model );
@@ -48,7 +49,8 @@ function [sol] = solve_parameter( param, fem_specifics, varargin )
 
         if strcmp( current_dirichlet, 'Y' )
             non_hom_dirichlet_functions = @(x) [1;0;0;0];
-            [ A, b ] = assembler_poisson( fespace, f, mu, non_hom_dirichlet_functions, neumann_functions );
+            [ A, b ] = assembler_poisson( fespace, f, mu, non_hom_dirichlet_functions,...
+                                                         neumann_functions );
             uL = b * 0.0;
             uL = apply_dirichlet_bc_rhs( uL, fespace, non_hom_dirichlet_functions );
             b = b - A * uL;

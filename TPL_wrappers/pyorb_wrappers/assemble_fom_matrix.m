@@ -1,10 +1,16 @@
 function [array] = assemble_fom_matrix( param, fem_specifics, varargin )
-% Assemble fom matrices A and M
+% Assemble FEM approximation of the matrices A (stiffness) and M (mass). Also, 
+% it is possible to evaluate it just at some mesh elements or DOF indices via 
+% varagin{1} and varagin{2} respectively.
 % input=
-%           param: vector of parameters; if 1, default stiffness matrix is
+%           param: vector of characteristic parameters; if 1, default stiffness matrix is
 %           constructed
 %           fem_specifics: struct containing the information to build the
 %           mesh and the fespace
+%           varargin: if passed, it contains as first element the list of
+%           mesh elements to be considered in computing the matrices and as
+%           second element the list of DOF indices at which evaluating the
+%           matrices
 % output=
 %           array: struct containing the mass and stiffness matrices in COO format
 

@@ -1,15 +1,23 @@
 function [array] = build_fom_affine_components_unsteady( operator, fem_specifics, varargin )
-% Assemble fom affine matrix for elliptic scalar problems
+% Assemble the FEM approximated affine components of the stiffness matrix, the 
+% mass matrix or the RHS forcing term for unsteady parabolic scalar problems
 % input=
-%           operator: operator corresponding to stiffness matrix or RHS 
+%           operator: operator corresponding to stiffness matrix ('A'), the mass matrix 
+%           ('M') or to the RHS ('f'). Additionally, the RHS can be
+%           evaluated only considering its spatial part, if this argument
+%           is passed as 'f_space'
 %           fem_specifics: struct containing the information to build the
-%           mesh, the fespace and the chosen model         
+%           mesh, the fespace and the chosen model
 %           varargin: if passed, it contains the reference test number as
 %           second argument (used in thermal block unsteady!) and the
-%           desired number of time instances as first argument
+%           desired number of time instances as first argument. Indeed the
+%           RHS affine components can be evaluated in an equispaced
+%           subset of time instances, if varargin{1} is not empty; in case,
+%           instead, it is empty, they are evaluated at all the time
+%           instants indicated in fem-specifics
 % output=
-%           array: struct containing the affine stiffness matrices in COO format
-
+%           array: struct containing the affine stiffness matrices or mass matrices 
+%           (in sparse COO format) or the affine RHS (in full format)
     
     considered_model = fem_specifics.model;
     

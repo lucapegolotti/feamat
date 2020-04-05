@@ -1,7 +1,7 @@
 function [sol] = get_exact_sol( params, fem_specifics, timestep_number, varargin)
-% Get the "exact" solution of the problem, via ode23t. Available only for
+% Get the "exact" solution of the problem, via ode23t function. Available only for
 % thermal block unsteady problem, over the specific test cases that have
-% been considered in pyorb
+% been considered in PyORB
 % input=
 %           param: vector of parameters
 %           fem_specifics: struct containing the information to build the
@@ -72,6 +72,5 @@ else
     disp("Impossible to compute the exact solution for the selected problem!")
     
 end
-
-           
+          
 end

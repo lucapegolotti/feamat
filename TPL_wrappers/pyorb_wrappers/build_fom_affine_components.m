@@ -1,11 +1,14 @@
 function [array] = build_fom_affine_components( operator, fem_specifics )
-% Assemble fom affine matrix for elliptic scalar problems
+% Assemble the FEM approximated affine components of the stiffness matrix or 
+% of the RHS forcing term for steady elliptic scalar problems
 % input=
-%           operator: operator corresponding to stiffness matrix or RHS 
+%           operator: operator corresponding to stiffness matrix ('A') or
+%           to the RHS ('f')
 %           fem_specifics: struct containing the information to build the
 %           mesh, the fespace and the chosen model
 % output=
-%           array: struct containing the affine stiffness matrices in COO format
+%           array: struct containing the affine stiffness matrices (in sparse COO
+%           format) or the affine RHS (in full format)
     
     considered_model = fem_specifics.model;
     
